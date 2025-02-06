@@ -1,0 +1,3 @@
+// Error page
+
+'use client'
