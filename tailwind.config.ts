@@ -19,8 +19,8 @@ export default {
         "txt-gray": "var(--txt-gray)",
       },
       fontFamily: {
-        'bevnpro': ['Be Vietnam Pro'],
-        'noto-sans': ['Noto Sans'],
+        'bevnpro': ['Be Vietnam Pro'], // Big headings
+        'noto-sans': ['Noto Sans'], // Text
       },
       screens: {
         sm: "576px",    
