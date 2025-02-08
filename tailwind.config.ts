@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 import {heroui} from "@heroui/react"; 
-// const {heroui} = require("@heroui/react");
 
 export default {
   content: [
@@ -12,11 +11,39 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        "primary-blue": "var(--primary-blue)",
+        "secondary-blue": "var(--secondary-blue)",
+        "white": "var(--white)",
+        "black": "var(--black)",
+        "bg-gray": "var(--bg-gray)",
+        "txt-gray": "var(--txt-gray)",
+      },
+      fontFamily: {
+        'bevnpro': ['Be Vietnam Pro'],
+        'noto-sans': ['Noto Sans'],
+      },
+      screens: {
+        sm: "576px",    
+        md: "768px",    
+        lg: "992px",    
+        xl: "1200px",   
       },
     },
   },
   darkMode: "class",
   plugins: [heroui()],
 } satisfies Config;
+
+/*
+1. Responsiveness
+- Phones (small + large) & Small tablets will have the same layout
+- Large tablet will have a separate layout
+- Laptop (small + large) & Desktop will have the same layout
+
+Small phones: 0 -> 576 (layout A)
+Lare phones + Small tablets: 576 -> 768 (layout A, bigger font sizes and spacing and...)
+Large tablets: 768 -> 992 (layout B)
+Small laptop: 992 -> 1200 (layout C)
+Large laptop + Desktop: > 1200 (layout C + bigger font sizes and spacing and...)
+
+*/
