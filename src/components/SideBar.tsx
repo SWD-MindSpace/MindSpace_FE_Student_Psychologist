@@ -1,4 +1,5 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react'
+import Link from 'next/link';
 import React from 'react'
 import { FiChevronDown, FiFileText, FiGrid, FiUsers } from 'react-icons/fi'
 
@@ -13,10 +14,10 @@ export default function SideBar() {
                 <nav className='mt-10'>
                     <ul className='space-y-20'>
                         <li className='flex items-center p-4 hover:bg-secondary-blue cursor-pointer'>
-                            <div className="flex items-center text-lg font-bevnpro font-bold">
+                            <Link href="/dashboard" className="flex items-center text-lg font-bevnpro font-bold">
                                 <FiGrid className="w-5 h-5" />
                                 <span className="ml-4">Dashboard</span>
-                            </div>
+                            </Link>
                         </li>
                         <Dropdown>
                             <DropdownTrigger>
@@ -29,8 +30,8 @@ export default function SideBar() {
                                 </li>
                             </DropdownTrigger>
                             <DropdownMenu className="font-noto-sans uppercase">
-                                <DropdownItem key="view-resources">View All Articles/Blogs</DropdownItem>
-                                <DropdownItem key="create-resources">Create a new Article/Blog</DropdownItem>
+                                <DropdownItem key="view-resources" as={Link} href="/articles">View All Articles/Blogs</DropdownItem>
+                                <DropdownItem key="create-resources" as={Link} href="/articles/create">Create a new Article/Blog</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                         <Dropdown>
@@ -44,9 +45,9 @@ export default function SideBar() {
                                 </li>
                             </DropdownTrigger>
                             <DropdownMenu className="font-noto-sans uppercase">
-                                <DropdownItem key="school-manager-account">School Manager Accounts</DropdownItem>
-                                <DropdownItem key="psychologist-account">Psychologists Accounts</DropdownItem>
-                                <DropdownItem key="create-account">Create a new account</DropdownItem>
+                                <DropdownItem key="school-manager-account" as={Link} href="/accounts/school-managers">School Manager Accounts</DropdownItem>
+                                <DropdownItem key="psychologist-account" as={Link} href="/accounts/psychologists">Psychologists Accounts</DropdownItem>
+                                <DropdownItem key="create-account" as={Link} href="/accounts/create">Create a new account</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </ul>
