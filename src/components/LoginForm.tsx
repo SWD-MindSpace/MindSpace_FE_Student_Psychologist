@@ -39,6 +39,7 @@ export default function LoginForm() {
             console.log("Access Token:", access_token);
 
             login({ id_token, access_token }); 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             setError(err.message || 'Something went wrong');
         }

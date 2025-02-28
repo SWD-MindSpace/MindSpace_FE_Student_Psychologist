@@ -15,10 +15,12 @@ export default function Home() {
         <div className="min-h-screen bg-gray-100">
             {/* Hero Section */}
             <section className="bg-blue-900 text-white py-20 text-center">
-                <h1 className="text-4xl font-bold">Welcome to MindSpace</h1>
-                <p className="mt-4 text-lg">Your journey to mental well-being starts here.</p>
+                <h1 className="text-4xl font-bold">Chào mừng bạn tới với MindSpace</h1>
+                <p className="mt-4 text-lg">Hành trình tìm kiếm hạnh phúc tinh thần của bạn bắt đầu từ đây.</p>
                 <Link href="/appointments">
-                    <Button color="primary" variant="solid" className="mt-6">Book an Appointment</Button>
+                    <Button color="primary" variant="solid" className="mt-6">
+                        Đặt một cuộc hẹn
+                    </Button>
                 </Link>
             </section>
 

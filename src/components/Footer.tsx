@@ -8,44 +8,46 @@ export default function Footer() {
     <footer className="bg-primary-blue text-white py-6 relative bottom-0 w-full">
       <div className="container mx-auto px-6 md:px-12 lg:px-20">
         <div className="grid grid-cols-1 md:grid-cols-4 text-center md:text-left">
-          <div>
-            <h2 className="text-3xl font-bold font-bevnpro">MindSpace</h2>
-            <p className="mt-2 text-base">Your trusted mental wellness platform.</p>
-            <p className="mt-2 text-base">Certified reliable mental site</p>
+          <div className='mr-10'>
+            <h2 className="text-2xl font-bold font-bevnpro">MindSpace</h2>
+            <p className="mt-2 text-sm">Nền tảng chăm sóc sức khỏe tinh thần đáng tin cậy.</p>
+            <p className="mt-2 text-sm">Trang web tinh thần đáng tin cậy được chứng nhận.</p>
             <p className="mt-2 text-lg font-noto-sans">
-              <Link href="#" className="hover:underline">Sign in for your help</Link>
+              <Link href="/login" className="hover:underline">
+                Đăng nhập để được trợ giúp.
+              </Link>
             </p>
           </div>
 
           <div>
-            <h2 className="text-xl font-bevnpro">Quick Links</h2>
+            <h2 className="text-xl font-bevnpro">Link nhanh</h2>
             <ul className="mt-2 space-y-2 text-sm">
               <li>
-                <Link href="/" className="hover:underline">Home</Link>
+                <Link href="/" className="hover:underline">Trang chủ</Link>
               </li>
               <li>
-                <Link href="/sp" className="hover:underline">Supporting programs</Link>
+                <Link href="/supporting-programs" className="hover:underline">Chương trình hỗ trợ</Link>
               </li>
               <li>
-                <Link href="#" className="hover:underline">About Us</Link>
+                <Link href="/about-us" className="hover:underline">Về chúng tôi</Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h2 className="text-xl font-bevnpro">Resources</h2>
+            <h2 className="text-xl font-bevnpro">Tài nguyên</h2>
             <ul className="mt-2 space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:underline">Blogs</Link>
+                <Link href="/resources" className="hover:underline">Blogs</Link>
               </li>
               <li>
-                <Link href="#" className="hover:underline">Articles</Link>
+                <Link href="/resources" className="hover:underline">Articles</Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h2 className="text-xl font-bevnpro">All tests</h2>
+            <h2 className="text-xl font-bevnpro">Các bài test</h2>
             <ul className="mt-2 space-y-2 text-sm">
               <li>
                 <Link href="#" className="hover:underline">Psychology test</Link>
@@ -55,7 +57,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
         </div>
 
         <div className="mt-6 text-center text-sm border-t border-gray-300 pt-4">

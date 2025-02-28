@@ -10,13 +10,23 @@ type Test = {
     id: number;
     title: string;
     testCode: string;
-    testCategoryId: string;
-    specializationId: string;
+    testCategory: {
+        id: number;
+        name: string;
+    };
+    specialization: {
+        id: number;
+        name: string;
+    };
     targetUser: string;
     description: string;
     questionCount: number;
     price: number;
-    authorId: number;
+    author: {
+        id: number;
+        fullName: string;
+        email: string;
+    };
     dueDate?: string;
 };
 
@@ -59,7 +69,8 @@ export default function AllTests() {
 
     return (
         <div className="min-h-screen p-6 bg-gray-100">
-            <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">📝 All Tests</h1>
+            <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">📝 Các bài kiểm tra</h1>
+            <Divider className='mb-10'/>
 
             {loading ? (
                 <div className="flex justify-center">
@@ -75,7 +86,7 @@ export default function AllTests() {
                         <Divider />
                         <CardBody>
                             <div className="grid gap-6">
-                                {tests.filter(test => test.testCategoryId === "3").map((test) => (
+                                {tests.filter(test => test.testCategory.id === 3).map((test) => (
                                     <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-xl transition duration-300">
                                         <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
                                         <CardBody>
@@ -97,7 +108,6 @@ export default function AllTests() {
                         </CardBody>
                     </Card>
 
-
                     <Card className="bg-green-50 shadow-lg">
                         <CardHeader className="text-green-700 flex items-center gap-2 text-2xl font-semibold">
                             <FaBrain size={30} />
@@ -106,7 +116,7 @@ export default function AllTests() {
                         <Divider />
                         <CardBody>
                             <div className="grid gap-6">
-                                {tests.filter(test => test.testCategoryId === "1").map((test) => (
+                                {tests.filter(test => test.testCategory.id === 1).map((test) => (
                                     <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
                                         <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
                                         <CardBody>
