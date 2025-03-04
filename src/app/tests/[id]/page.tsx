@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface TestScoreRank {
     minScore: number;
@@ -22,6 +23,7 @@ interface Question {
 }
 
 interface Test {
+    id: string;
     title: string;
     description: string;
     questions: Question[];
@@ -37,6 +39,13 @@ export default function TestPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            alert("Bạn cần đăng nhập để thực hiện bài kiểm tra.");
+            router.push("/login");
+            return;
+        }
+
         const fetchTest = async () => {
             try {
                 const response = await fetch(`https://localhost:7096/api/v1/tests/${id}`, {
@@ -56,7 +65,7 @@ export default function TestPage() {
             }
         };
         fetchTest();
-    }, [id]);
+    }, [id, router]);
 
     const handleSelect = (questionId: number, optionScore: number) => {
         setAnswers((prevAnswers) => ({
@@ -71,8 +80,29 @@ export default function TestPage() {
         const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
         const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || 'Không xác định';
 
-        alert(`Kết quả của bạn: ${result}`);
-        router.push('/alltests');
+        // Use user-specific key for test history
+        const userId = localStorage.getItem("userId") || "unknown";
+        const historyKey = `test-history-${userId}`;
+        const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+        const newEntry = {
+            testId: test.id,
+            title: test.title,
+            date: new Date().toLocaleString(),
+            totalScore,
+            result,
+        };
+        localStorage.setItem(historyKey, JSON.stringify([...history, newEntry]));
+
+        toast.success(`Kết quả của bạn: ${result}`, {
+            duration: 5000,
+            style: {
+                fontWeight: 'bold',
+                borderRadius: '10px',
+                padding: '20px',
+            },
+        });
+
+        router.push('/history-test');
     };
 
     if (loading) return <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>;
@@ -80,6 +110,7 @@ export default function TestPage() {
 
     return (
         <div className="min-h-screen px-4 py-6 bg-gray-50">
+            <Toaster position="top-center" reverseOrder={false} />
             <Card className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-4">
                 <CardHeader className="flex justify-center text-xl font-semibold text-blue-700">{test.title}</CardHeader>
                 <CardBody className="text-gray-700 text-sm">

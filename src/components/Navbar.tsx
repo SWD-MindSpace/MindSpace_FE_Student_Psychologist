@@ -53,7 +53,7 @@ export default function TopNav() {
                             <Link href="/profile">Hồ sơ</Link>
                         </DropdownItem>
                         <DropdownItem key="text-history">
-                            <Link href="#">Lịch sử kiểm tra</Link>
+                            <Link href="/history-test">Lịch sử kiểm tra</Link>
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -101,10 +101,10 @@ export default function TopNav() {
                         </DropdownTrigger>
                         <DropdownMenu>
                             <DropdownItem key="profile">
-                                <Link href="#">Hồ sơ</Link>
+                                <Link href="/profile">Hồ sơ</Link>
                             </DropdownItem>
                             <DropdownItem key="text-history">
-                                <Link href="#">Lịch sử kiểm tra</Link>
+                                <Link href="/history-test">Lịch sử kiểm tra</Link>
                             </DropdownItem>
                         </DropdownMenu>
                     </Dropdown>

@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         localStorage.removeItem('idToken');
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('userId');
         setUser(null);
         router.push('/login');
     }, [router]);
@@ -65,10 +66,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const login = ({ id_token, access_token }: { id_token: string; access_token: string }) => {
-        localStorage.setItem('idToken', id_token);
-        localStorage.setItem('accessToken', access_token);
-        setUser({ idToken: id_token, accessToken: access_token });
-        router.push('/');
+        try {
+            // Decode access token
+            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            const userId = payload.sub; // Extract user ID
+
+            if (!userId) throw new Error("User ID (sub) not found in token");
+
+            // Store tokens and user ID
+            localStorage.setItem('idToken', id_token);
+            localStorage.setItem('accessToken', access_token);
+            localStorage.setItem('userId', userId);
+
+            setUser({ idToken: id_token, accessToken: access_token });
+            router.push('/');
+        } catch (error) {
+            console.error('Error decoding access token:', error);
+        }
     };
 
     return (
