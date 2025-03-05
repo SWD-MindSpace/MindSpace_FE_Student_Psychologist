@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, Button, Spinner, Divider } from "@heroui/react";
 import { AiOutlineClockCircle } from 'react-icons/ai';
 import { FaBrain } from 'react-icons/fa';
+import toast, { Toaster } from 'react-hot-toast';
 
 type Test = {
     id: number;
@@ -67,10 +68,31 @@ export default function AllTests() {
         return dateString ? new Date(dateString).toLocaleDateString() : "N/A";
     };
 
+    const handleStartTest = (testId: number) => {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            toast.error('Please login to start the test!', {
+                duration: 3000,
+                style: {
+                    background: '#f87171',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    padding: '20px',
+                    borderRadius: '10px',
+                },
+            });
+            return;
+        }
+
+        router.push(`/tests/${testId}`);
+    };
+
     return (
         <div className="min-h-screen p-6 bg-gray-100">
-            <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">📝 Các bài kiểm tra</h1>
-            <Divider className='mb-10'/>
+            <Toaster position="top-center" reverseOrder={false} />
+            <h1 className="text-4xl font-bold font-bevnpro text-center text-blue-700 mb-8">Các bài kiểm tra</h1>
+            <Divider className='mb-10 w-1/2 mx-auto'/>
 
             {loading ? (
                 <div className="flex justify-center">
@@ -97,7 +119,7 @@ export default function AllTests() {
                                                 color="primary"
                                                 variant="shadow"
                                                 className="mt-3 w-fit p-5"
-                                                onPress={() => router.push(`/tests/${test.id}`)}
+                                                onPress={() => handleStartTest(test.id)}
                                             >
                                                 Take Test
                                             </Button>
@@ -126,7 +148,7 @@ export default function AllTests() {
                                                 color="success"
                                                 variant="shadow"
                                                 className="mt-3 w-fit p-5"
-                                                onPress={() => router.push(`/tests/${test.id}`)}
+                                                onPress={() => handleStartTest(test.id)}
                                             >
                                                 Start Test
                                             </Button>

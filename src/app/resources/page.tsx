@@ -16,7 +16,6 @@ interface Article {
   id: number;
   title: string;
   introduction: string;
-  articleUrl: string;
   thumbnailUrl: string;
 }
 
@@ -92,8 +91,8 @@ export default function ResourcesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {(view === 'blogs' ? blogPosts : articles).map((item) => (
-              <Link key={item.id} href={view === 'blogs' ? `/blog/${item.id}` : item.thumbnailUrl} className="h-full" target={view === 'articles' ? '_blank' : undefined} rel={view === 'articles' ? 'noopener noreferrer' : undefined}>
-                <Card className="hover:shadow-xl transition-shadow border border-gray-200 rounded-lg flex flex-col h-full">
+              <Link key={item.id} href={view === 'blogs' ? `/blog/${item.id}` : `/articles/${item.id}`} className="h-full">
+                <Card className="hover:shadow-xl transition-transform hover:scale-105 border border-gray-200 rounded-lg flex flex-col h-full">
                   {/* Thumbnail Image */}
                   <Image src={item.thumbnailUrl} alt={item.title} className="w-full h-40 object-cover rounded-t-lg" />
 
