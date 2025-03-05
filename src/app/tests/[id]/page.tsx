@@ -110,7 +110,7 @@ export default function TestPage() {
         };
         // Gửi request POST để lưu testResponse
         try {
-            const response = await fetch('https://localhost:7096/api/v1/testresponses', {
+            const response = await fetch('https://localhost:7096/api/v1/test-responses', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
