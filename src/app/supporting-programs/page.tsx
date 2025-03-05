@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, CardHeader, Button, Spinner, Image, Divider } from "@heroui/react";
+import { Card, CardBody, CardHeader, Button, Spinner, Image } from "@heroui/react";
 import { FaMapMarkerAlt, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaBookOpen } from 'react-icons/fa';
 
 interface SupportingProgram {
@@ -50,17 +50,18 @@ export default function SupportingPrograms() {
     }, []);
 
     return (
-        <div className="min-h-screen p-6 bg-gray-100">
-            <h1 className="text-4xl font-bold text-center text-blue-700 mb-8 flex items-center justify-center">
-                <FaBookOpen className="mr-3" /> Chương trình hỗ trợ
-            </h1>
-            <Divider className='mb-10' />
+        <div className="min-h-screen bg-gray-100">
+            <div className='bg-gradient-to-r from-purple-500 to-indigo-600 py-16 px-6 mb-10'>
+                <h1 className="text-4xl font-bold text-center text-white flex items-center justify-center">
+                    <FaBookOpen className="mr-3" /> Chương trình hỗ trợ
+                </h1>
+            </div>
             {loading ? (
                 <div className="flex justify-center">
                     <Spinner size="lg" color="primary" />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                     {programs.map((program) => (
                         <Card key={program.id} className="p-4 bg-white shadow-md hover:shadow-lg transition duration-300">
                             <Image src={program.thumbnailUrl} alt={program.city} className="w-full h-40 object-cover rounded-md" />
