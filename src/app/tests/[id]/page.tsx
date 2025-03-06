@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { useAuth } from '@/context/AuthContext'; 
 
 interface TestScoreRank {
     minScore: number;
@@ -40,7 +41,7 @@ interface TestResponseItem {
 interface TestResponse {
     totalScore: number;
     testScoreRankResult?: string;
-    studentId: number;
+    studentId: number | null;
     parentId: number | null;
     testId?: number;
     testResponseItems: TestResponseItem[];
@@ -49,10 +50,44 @@ interface TestResponse {
 export default function TestPage() {
     const { id } = useParams();
     const router = useRouter();
+    const { user } = useAuth(); // Get user info from AuthContext
+
     const [test, setTest] = useState<Test | null>(null);
     const [answers, setAnswers] = useState<{ [key: number]: TestOption }>({});
     const [loading, setLoading] = useState(true);
+    const [studentId, setStudentId] = useState<number | null>(null);
+    const [parentId, setParentId] = useState<number | null>(null);
 
+    // Extract studentId or parentId from JWT token
+    useEffect(() => {
+        if (user?.accessToken) {
+            try {
+                const payloadBase64 = user.accessToken.split('.')[1];
+                if (!payloadBase64) throw new Error("Invalid token format");
+    
+                const decodedPayload = JSON.parse(atob(payloadBase64));   
+                const userId = decodedPayload.sub ? parseInt(decodedPayload.sub) : null;
+                const userRole = decodedPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]; // Fix role extraction
+    
+                if (!userId || !userRole) {
+                    throw new Error("User ID or Role missing in token");
+                }
+    
+                if (userRole === "Student") {
+                    setStudentId(userId);
+                } else if (userRole === "Parent") {
+                    setParentId(userId);
+                } else {
+                    throw new Error("Unexpected role in token: " + userRole);
+                }
+            } catch (error) {
+                console.error("Error decoding accessToken:", error);
+            }
+        }
+    }, [user]);
+    
+
+    // Fetch test details
     useEffect(() => {
         const fetchTest = async () => {
             try {
@@ -75,6 +110,7 @@ export default function TestPage() {
         fetchTest();
     }, [id]);
 
+    // Handle answer selection
     const handleSelect = (questionId: number, option: TestOption) => {
         setAnswers((prevAnswers) => ({
             ...prevAnswers,
@@ -82,14 +118,15 @@ export default function TestPage() {
         }));
     };
 
+    // Handle test submission
     const handleSubmit = async () => {
-        if (!test) return;
+        if (!test || (!studentId && !parentId)) return; // Ensure at least one ID is set
 
-        // Tính tổng score
+        // Calculate total score
         const totalScore = Object.values(answers).reduce((sum, option) => sum + (option.score || 0), 0);
         const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || undefined;
 
-        // Tạo testResponseItems từ answers
+        // Create testResponseItems from answers
         const testResponseItems: TestResponseItem[] = Object.entries(answers).map(([questionId, option]) => {
             const question = test.questions.find(q => q.id === Number(questionId));
             return {
@@ -99,16 +136,16 @@ export default function TestPage() {
             };
         });
 
-        // Tạo dữ liệu testResponse
+        // Create testResponse payload
         const testResponse: TestResponse = {
             totalScore,
             testScoreRankResult: result,
-            studentId: 1, // lay tu access token
-            parentId: null,
+            studentId: studentId || null, // Send only if student
+            parentId: parentId || null, // Send only if parent
             testId: test.id,
             testResponseItems
         };
-        // Gửi request POST để lưu testResponse
+
         try {
             const response = await fetch('https://localhost:7096/api/v1/test-responses', {
                 method: 'POST',
@@ -118,17 +155,20 @@ export default function TestPage() {
                 },
                 body: JSON.stringify(testResponse),
             });
+
             const locationUrl = response.headers.get('Location');
-            console.log(locationUrl)
             if (!locationUrl) throw new Error('Location header not found');
-            router.push(new URL(locationUrl).pathname); // chinh lai di toi trang test detail by id
+
+            const testResponseId = locationUrl.split('/').pop();
+            if (!testResponseId) throw new Error("Invalid response location");
+
+            router.push(`/test-responses/${testResponseId}`);
         } catch (error) {
             console.error('Error saving test response:', error);
             alert('Có lỗi khi lưu kết quả bài kiểm tra');
         }
-        const msg = `Kết quả của bạn: ${result}`;
-        result == undefined ? alert('Đã hoàn thành bài khảo sát') : alert(msg);
 
+        alert(result ? `Kết quả của bạn: ${result}` : 'Đã hoàn thành bài khảo sát');
     };
 
     if (loading) return <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>;
@@ -166,6 +206,7 @@ export default function TestPage() {
                         variant="bordered"
                         className="mt-4 w-full p-3 text-sm font-semibold"
                         onPress={handleSubmit}
+                        disabled={!studentId && !parentId} // Ensure either student or parent is set
                     >
                         Hoàn thành bài kiểm tra
                     </Button>
