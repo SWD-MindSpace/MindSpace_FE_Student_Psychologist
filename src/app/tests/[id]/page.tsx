@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
-import toast, { Toaster } from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext'; 
 
 interface TestScoreRank {
     minScore: number;
@@ -31,13 +31,62 @@ interface Test {
     psychologyTestOptions: TestOption[];
 }
 
+interface TestResponseItem {
+    questionContent: string;
+    score: number;
+    answerText: string;
+}
+
+interface TestResponse {
+    totalScore: number;
+    testScoreRankResult?: string;
+    studentId: number | null;
+    parentId: number | null;
+    testId?: number;
+    testResponseItems: TestResponseItem[];
+}
+
 export default function TestPage() {
     const { id } = useParams();
     const router = useRouter();
+    const { user } = useAuth(); // Get user info from AuthContext
+
     const [test, setTest] = useState<Test | null>(null);
     const [answers, setAnswers] = useState<{ [key: number]: number }>({});
     const [loading, setLoading] = useState(true);
+    const [studentId, setStudentId] = useState<number | null>(null);
+    const [parentId, setParentId] = useState<number | null>(null);
 
+    // Extract studentId or parentId from JWT token
+    useEffect(() => {
+        if (user?.accessToken) {
+            try {
+                const payloadBase64 = user.accessToken.split('.')[1];
+                if (!payloadBase64) throw new Error("Invalid token format");
+    
+                const decodedPayload = JSON.parse(atob(payloadBase64));   
+                const userId = decodedPayload.sub ? parseInt(decodedPayload.sub) : null;
+                const userRole = decodedPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]; // Fix role extraction
+    
+                if (!userId || !userRole) {
+                    throw new Error("User ID or Role missing in token");
+                }
+    
+                if (userRole === "Student") {
+                    setStudentId(userId);
+                } else if (userRole === "Parent") {
+                    setParentId(userId);
+                } else {
+                    throw new Error("Unexpected role in token: " + userRole);
+                }
+            } catch (error) {
+                console.error("Error decoding accessToken:", error);
+            }
+        }
+    }, [user]);
+    
+
+    // Fetch test details
     useEffect(() => {
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) {
@@ -67,42 +116,65 @@ export default function TestPage() {
         fetchTest();
     }, [id, router]);
 
-    const handleSelect = (questionId: number, optionScore: number) => {
+    // Handle answer selection
+    const handleSelect = (questionId: number, option: TestOption) => {
         setAnswers((prevAnswers) => ({
             ...prevAnswers,
             [questionId]: optionScore
         }));
     };
 
-    const handleSubmit = () => {
-        if (!test) return;
+    // Handle test submission
+    const handleSubmit = async () => {
+        if (!test || (!studentId && !parentId)) return; // Ensure at least one ID is set
 
-        const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
-        const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || 'Không xác định';
+        // Calculate total score
+        const totalScore = Object.values(answers).reduce((sum, option) => sum + (option.score || 0), 0);
+        const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || undefined;
 
-        // Use user-specific key for test history
-        const userId = localStorage.getItem("userId") || "unknown";
-        const historyKey = `test-history-${userId}`;
-        const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
-        const newEntry = {
-            testId: test.id,
-            title: test.title,
-            date: new Date().toLocaleString(),
-            totalScore,
-            result,
-        };
-        localStorage.setItem(historyKey, JSON.stringify([...history, newEntry]));
-
-        toast.success(`Kết quả của bạn: ${result}`, {
-            duration: 5000,
-            style: {
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                padding: '20px',
-            },
+        // Create testResponseItems from answers
+        const testResponseItems: TestResponseItem[] = Object.entries(answers).map(([questionId, option]) => {
+            const question = test.questions.find(q => q.id === Number(questionId));
+            return {
+                questionContent: question?.content || "",
+                score: option.score || 0,
+                answerText: option.displayedText
+            };
         });
 
-        router.push('/history-test');
+        // Create testResponse payload
+        const testResponse: TestResponse = {
+            totalScore,
+            testScoreRankResult: result,
+            studentId: studentId || null, // Send only if student
+            parentId: parentId || null, // Send only if parent
+            testId: test.id,
+            testResponseItems
+        };
+
+        try {
+            const response = await fetch('https://localhost:7096/api/v1/test-responses', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(testResponse),
+            });
+
+            const locationUrl = response.headers.get('Location');
+            if (!locationUrl) throw new Error('Location header not found');
+
+            const testResponseId = locationUrl.split('/').pop();
+            if (!testResponseId) throw new Error("Invalid response location");
+
+            router.push(`/test-responses/${testResponseId}`);
+        } catch (error) {
+            console.error('Error saving test response:', error);
+            alert('Có lỗi khi lưu kết quả bài kiểm tra');
+        }
+
+        alert(result ? `Kết quả của bạn: ${result}` : 'Đã hoàn thành bài khảo sát');
     };
 
     if (loading) return <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>;
@@ -134,7 +206,13 @@ export default function TestPage() {
                             </div>
                         </div>
                     ))}
-                    <Button color="success" variant="bordered" className="mt-4 w-full p-3 text-sm font-semibold" onPress={handleSubmit}>
+                    <Button
+                        color="success"
+                        variant="bordered"
+                        className="mt-4 w-full p-3 text-sm font-semibold"
+                        onPress={handleSubmit}
+                        disabled={!studentId && !parentId} // Ensure either student or parent is set
+                    >
                         Hoàn thành bài kiểm tra
                     </Button>
                 </CardBody>

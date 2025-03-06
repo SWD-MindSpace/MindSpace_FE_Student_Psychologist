@@ -46,45 +46,60 @@ export default function LoginForm() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-300">
-            <Card className="w-[400px] p-6 shadow-lg">
-                <CardHeader className="text-2xl font-bold">Login</CardHeader>
-                <Divider />
-                <CardBody>
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                    <form onSubmit={handleLogin} className="flex flex-col gap-4 mt-4">
-                        <Input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            startContent={<FiMail size={20} />}
-                            label="Email"
-                            placeholder="Enter your email"
-                            isRequired
-                        />
-                        <Input
-                            type={type}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            startContent={<FiLock size={20} />}
-                            endContent={
-                                <span className="cursor-pointer" onClick={() => setType(type === 'password' ? 'text' : 'password')}>
-                                    {type === 'password' ? <FaRegEyeSlash size={20} /> : <FaRegEye size={20} />}
-                                </span>
-                            }
-                            label="Password"
-                            placeholder="Enter your password"
-                            isRequired
-                        />
-                        <Button type="submit" color="primary" className="mt-2">
-                            Login
-                        </Button>
-                        <Button onPress={() => router.push('/')} color="secondary" variant="flat">
-                            Back
-                        </Button>
-                    </form>
-                </CardBody>
-            </Card>
+        <div className="flex min-h-screen">
+            <div className="hidden md:flex w-1/2 bg-cover bg-center" 
+                style={{ backgroundImage: "url('https://res.cloudinary.com/ddewgbug1/image/upload/v1741272595/zvzarkuxvt4jmfscpfji.avif')" }}>
+            </div>
+
+            <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gray-100 p-8">
+                <div className="text-4xl font-bold font-bevnpro text-indigo-600 mb-6">
+                    MindSpace 
+                </div>
+
+                <Card className="w-[400px] p-8 rounded-xl shadow-lg bg-white">
+                    <CardHeader className="text-2xl font-bold text-center text-gray-800">
+                        Login
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                        <form onSubmit={handleLogin} className="flex flex-col gap-5 mt-4">
+                            <Input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                startContent={<FiMail size={20} className="text-gray-500" />}
+                                label="Email"
+                                placeholder="Enter your email"
+                                isRequired
+                                className="border-gray-300 focus:border-indigo-500"
+                            />
+                            <Input
+                                type={type}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                startContent={<FiLock size={20} className="text-gray-500" />}
+                                endContent={
+                                    <span className="cursor-pointer text-gray-500 hover:text-indigo-500" 
+                                        onClick={() => setType(type === 'password' ? 'text' : 'password')}>
+                                        {type === 'password' ? <FaRegEyeSlash size={20} /> : <FaRegEye size={20} />}
+                                    </span>
+                                }
+                                label="Password"
+                                placeholder="Enter your password"
+                                isRequired
+                                className="border-gray-300 focus:border-indigo-500"
+                            />
+                            <Button type="submit" color="primary" className="mt-3 bg-indigo-600 hover:bg-indigo-700 transition">
+                                Login
+                            </Button>
+                            <Button onPress={() => router.push('/')} color="secondary" variant="flat" className="mt-2 text-gray-700 hover:text-gray-900">
+                                Back
+                            </Button>
+                        </form>
+                    </CardBody>
+                </Card>
+            </div>
         </div>
     );
 }

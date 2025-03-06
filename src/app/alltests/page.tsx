@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, Button, Spinner, Divider } from "@heroui/react";
-import { AiOutlineClockCircle } from 'react-icons/ai';
-import { FaBrain } from 'react-icons/fa';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 
 type Test = {
     id: number;
@@ -34,9 +32,13 @@ type Test = {
 export default function AllTests() {
     const [tests, setTests] = useState<Test[]>([]);
     const [loading, setLoading] = useState(true);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
+        const storedRole = localStorage.getItem("userRole");
+        setUserRole(storedRole);
+
         const fetchTests = async () => {
             try {
                 const response = await fetch(
@@ -64,10 +66,6 @@ export default function AllTests() {
         fetchTests();
     }, []);
 
-    const formatDate = (dateString?: string) => {
-        return dateString ? new Date(dateString).toLocaleDateString() : "N/A";
-    };
-
     const handleStartTest = (testId: number) => {
         const accessToken = localStorage.getItem('accessToken');
 
@@ -88,33 +86,56 @@ export default function AllTests() {
         router.push(`/tests/${testId}`);
     };
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <Spinner size="lg" color="primary" />
+            </div>
+        );
+    }
+
+    // Define displayed tests based on user role
+    let displayedTests: Test[] = [];
+    let psychologicalTests: Test[] = [];
+    let periodicTests: Test[] = [];
+
+    if (!userRole) {
+        // If not logged in → Show "Parent" & "Student" tests (excluding "Periodic")
+        displayedTests = tests.filter(
+            (test) => (test.targetUser === "Parent" || test.targetUser === "Student") &&
+                test.testCategory.name !== "Periodic"
+        );
+    } else if (userRole === "Student") {
+        // If logged in as Student → Separate Psychological and Periodic tests
+        psychologicalTests = tests.filter((test) => test.testCategory.name === "Psychological");
+        periodicTests = tests.filter((test) => test.testCategory.name === "Periodic");
+    } else if (userRole === "Parent") {
+        // If logged in as Parent → Show only "Parenting" tests
+        displayedTests = tests.filter((test) => test.testCategory.name === "Parenting");
+    }
+
     return (
         <div className="min-h-screen p-6 bg-gray-100">
             <Toaster position="top-center" reverseOrder={false} />
-            <h1 className="text-4xl font-bold font-bevnpro text-center text-blue-700 mb-8">Các bài kiểm tra</h1>
-            <Divider className='mb-10 w-1/2 mx-auto'/>
+            <h1 className="text-4xl font-bold font-bevnpro text-center text-blue-700 mb-8">
+                Các bài kiểm tra
+            </h1>
+            <Divider className='mb-10 w-1/2 mx-auto' />
 
-            {loading ? (
-                <div className="flex justify-center">
-                    <Spinner size="lg" color="primary" />
-                </div>
-            ) : (
+            {/* If user is a Student, show Psychological & Periodic separately */}
+            {userRole === "Student" ? (
                 <>
-                    <Card className="mb-10 bg-blue-50 shadow-lg">
-                        <CardHeader className="text-blue-700 flex items-center gap-2 text-2xl font-semibold">
-                            <AiOutlineClockCircle size={30} />
-                            Periodic Tests
-                        </CardHeader>
-                        <Divider />
-                        <CardBody>
+                    {/* Psychological Tests */}
+                    {psychologicalTests.length > 0 && (
+                        <>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Psychological Tests</h2>
                             <div className="grid gap-6">
-                                {tests.filter(test => test.testCategory.id === 3).map((test) => (
-                                    <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-xl transition duration-300">
+                                {psychologicalTests.map((test) => (
+                                    <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
                                         <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
                                         <CardBody>
                                             <p className="text-black text-lg">{test.testCode}</p>
                                             <p className="text-gray-600 text-lg">{test.description}</p>
-                                            <p className="text-red-500 font-semibold">📅 Due Date: {formatDate(test.dueDate)}</p>
                                             <Button
                                                 color="primary"
                                                 variant="shadow"
@@ -127,19 +148,17 @@ export default function AllTests() {
                                     </Card>
                                 ))}
                             </div>
-                        </CardBody>
-                    </Card>
+                        </>
+                    )}
 
-                    <Card className="bg-green-50 shadow-lg">
-                        <CardHeader className="text-green-700 flex items-center gap-2 text-2xl font-semibold">
-                            <FaBrain size={30} />
-                            Psychologist Tests
-                        </CardHeader>
-                        <Divider />
-                        <CardBody>
+                    {/* Periodic Tests */}
+                    {periodicTests.length > 0 && (
+                        <>
+                            <Divider className="my-10" />
+                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Periodic Tests</h2>
                             <div className="grid gap-6">
-                                {tests.filter(test => test.testCategory.id === 1).map((test) => (
-                                    <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
+                                {periodicTests.map((test) => (
+                                    <Card key={test.id} className="p-6 bg-yellow-50 shadow-md hover:shadow-lg transition duration-300">
                                         <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
                                         <CardBody>
                                             <p className="text-black text-lg">{test.testCode}</p>
@@ -150,15 +169,42 @@ export default function AllTests() {
                                                 className="mt-3 w-fit p-5"
                                                 onPress={() => handleStartTest(test.id)}
                                             >
-                                                Start Test
+                                                Take Test
                                             </Button>
                                         </CardBody>
                                     </Card>
                                 ))}
                             </div>
-                        </CardBody>
-                    </Card>
+                        </>
+                    )}
                 </>
+            ) : (
+                // For other users (Not logged in or Parent)
+                displayedTests.length === 0 ? (
+                    <p className="text-center text-lg font-semibold text-gray-600">
+                        No tests available.
+                    </p>
+                ) : (
+                    <div className="grid gap-6">
+                        {displayedTests.map((test) => (
+                            <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
+                                <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
+                                <CardBody>
+                                    <p className="text-black text-lg">{test.testCode}</p>
+                                    <p className="text-gray-600 text-lg">{test.description}</p>
+                                    <Button
+                                        color="primary"
+                                        variant="shadow"
+                                        className="mt-3 w-fit p-5"
+                                        onPress={() => handleStartTest(test.id)}
+                                    >
+                                        Take Test
+                                    </Button>
+                                </CardBody>
+                            </Card>
+                        ))}
+                    </div>
+                )
             )}
         </div>
     );
