@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
-import toast, { Toaster } from 'react-hot-toast';
 
 interface TestScoreRank {
     minScore: number;
@@ -13,17 +12,18 @@ interface TestScoreRank {
 
 interface TestOption {
     id: number;
-    score: number;
+    score?: number;
     displayedText: string;
 }
 
 interface Question {
     id: number;
     content: string;
+    questionOptions: TestOption[];
 }
 
 interface Test {
-    id: string;
+    id?: number;
     title: string;
     description: string;
     questions: Question[];
@@ -31,21 +31,29 @@ interface Test {
     psychologyTestOptions: TestOption[];
 }
 
+interface TestResponseItem {
+    questionContent: string;
+    score: number;
+    answerText: string;
+}
+
+interface TestResponse {
+    totalScore: number;
+    testScoreRankResult?: string;
+    studentId: number;
+    parentId: number | null;
+    testId?: number;
+    testResponseItems: TestResponseItem[];
+}
+
 export default function TestPage() {
     const { id } = useParams();
     const router = useRouter();
     const [test, setTest] = useState<Test | null>(null);
-    const [answers, setAnswers] = useState<{ [key: number]: number }>({});
+    const [answers, setAnswers] = useState<{ [key: number]: TestOption }>({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
-            alert("Bạn cần đăng nhập để thực hiện bài kiểm tra.");
-            router.push("/login");
-            return;
-        }
-
         const fetchTest = async () => {
             try {
                 const response = await fetch(`https://localhost:7096/api/v1/tests/${id}`, {
@@ -65,44 +73,62 @@ export default function TestPage() {
             }
         };
         fetchTest();
-    }, [id, router]);
+    }, [id]);
 
-    const handleSelect = (questionId: number, optionScore: number) => {
+    const handleSelect = (questionId: number, option: TestOption) => {
         setAnswers((prevAnswers) => ({
             ...prevAnswers,
-            [questionId]: optionScore
+            [questionId]: option
         }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!test) return;
 
-        const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
-        const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || 'Không xác định';
+        // Tính tổng score
+        const totalScore = Object.values(answers).reduce((sum, option) => sum + (option.score || 0), 0);
+        const result = test.testScoreRanks.find(rank => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result || undefined;
 
-        // Use user-specific key for test history
-        const userId = localStorage.getItem("userId") || "unknown";
-        const historyKey = `test-history-${userId}`;
-        const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
-        const newEntry = {
-            testId: test.id,
-            title: test.title,
-            date: new Date().toLocaleString(),
-            totalScore,
-            result,
-        };
-        localStorage.setItem(historyKey, JSON.stringify([...history, newEntry]));
-
-        toast.success(`Kết quả của bạn: ${result}`, {
-            duration: 5000,
-            style: {
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                padding: '20px',
-            },
+        // Tạo testResponseItems từ answers
+        const testResponseItems: TestResponseItem[] = Object.entries(answers).map(([questionId, option]) => {
+            const question = test.questions.find(q => q.id === Number(questionId));
+            return {
+                questionContent: question?.content || "",
+                score: option.score || 0,
+                answerText: option.displayedText
+            };
         });
 
-        router.push('/history-test');
+        // Tạo dữ liệu testResponse
+        const testResponse: TestResponse = {
+            totalScore,
+            testScoreRankResult: result,
+            studentId: 1, // lay tu access token
+            parentId: null,
+            testId: test.id,
+            testResponseItems
+        };
+        // Gửi request POST để lưu testResponse
+        try {
+            const response = await fetch('https://localhost:7096/api/v1/test-responses', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(testResponse),
+            });
+            const locationUrl = response.headers.get('Location');
+            console.log(locationUrl)
+            if (!locationUrl) throw new Error('Location header not found');
+            router.push(new URL(locationUrl).pathname); // chinh lai di toi trang test detail by id
+        } catch (error) {
+            console.error('Error saving test response:', error);
+            alert('Có lỗi khi lưu kết quả bài kiểm tra');
+        }
+        const msg = `Kết quả của bạn: ${result}`;
+        result == undefined ? alert('Đã hoàn thành bài khảo sát') : alert(msg);
+
     };
 
     if (loading) return <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>;
@@ -110,7 +136,6 @@ export default function TestPage() {
 
     return (
         <div className="min-h-screen px-4 py-6 bg-gray-50">
-            <Toaster position="top-center" reverseOrder={false} />
             <Card className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-4">
                 <CardHeader className="flex justify-center text-xl font-semibold text-blue-700">{test.title}</CardHeader>
                 <CardBody className="text-gray-700 text-sm">
@@ -120,21 +145,28 @@ export default function TestPage() {
                         <div key={question.id} className="mb-3 p-3 bg-gray-100 rounded-md shadow-sm">
                             <p className="text-sm font-medium">{question.content}</p>
                             <div className="mt-2 grid gap-3">
-                                {test.psychologyTestOptions.map((option) => (
-                                    <Button
-                                        key={option.id}
-                                        color={answers[question.id] === option.score ? 'danger' : 'default'}
-                                        variant="flat"
-                                        className="w-full text-xs py-2"
-                                        onPress={() => handleSelect(question.id, option.score)}
-                                    >
-                                        {option.displayedText}
-                                    </Button>
-                                ))}
+                                {(test.psychologyTestOptions.length > 0
+                                    ? test.psychologyTestOptions
+                                    : question.questionOptions).map((option) => (
+                                        <Button
+                                            key={option.id}
+                                            color={answers[question.id]?.id === option.id ? 'primary' : 'default'}
+                                            variant="flat"
+                                            className="w-full text-xs py-2"
+                                            onPress={() => handleSelect(question.id, option)}
+                                        >
+                                            {option.displayedText}
+                                        </Button>
+                                    ))}
                             </div>
                         </div>
                     ))}
-                    <Button color="success" variant="bordered" className="mt-4 w-full p-3 text-sm font-semibold" onPress={handleSubmit}>
+                    <Button
+                        color="success"
+                        variant="bordered"
+                        className="mt-4 w-full p-3 text-sm font-semibold"
+                        onPress={handleSubmit}
+                    >
                         Hoàn thành bài kiểm tra
                     </Button>
                 </CardBody>
