@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
 
 interface TestScoreRank {
     minScore: number;
@@ -50,7 +50,7 @@ interface TestResponse {
 export default function TestPage() {
     const { id } = useParams();
     const router = useRouter();
-    const { user } = useAuth(); // Get user info from AuthContext
+    const { user } = useAuth();
 
     const [test, setTest] = useState<Test | null>(null);
     const [answers, setAnswers] = useState<{ [key: number]: TestOption }>({});
@@ -64,15 +64,15 @@ export default function TestPage() {
             try {
                 const payloadBase64 = user.accessToken.split('.')[1];
                 if (!payloadBase64) throw new Error("Invalid token format");
-    
-                const decodedPayload = JSON.parse(atob(payloadBase64));   
+
+                const decodedPayload = JSON.parse(atob(payloadBase64));
                 const userId = decodedPayload.sub ? parseInt(decodedPayload.sub) : null;
                 const userRole = decodedPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]; // Fix role extraction
-    
+
                 if (!userId || !userRole) {
                     throw new Error("User ID or Role missing in token");
                 }
-    
+
                 if (userRole === "Student") {
                     setStudentId(userId);
                 } else if (userRole === "Parent") {
@@ -85,10 +85,15 @@ export default function TestPage() {
             }
         }
     }, [user]);
-    
+
 
     // Fetch test details
     useEffect(() => {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            router.push("/login");
+            return;
+        }
         const fetchTest = async () => {
             try {
                 const response = await fetch(`https://localhost:7096/api/v1/tests/${id}`, {
@@ -108,7 +113,7 @@ export default function TestPage() {
             }
         };
         fetchTest();
-    }, [id]);
+    }, [id, router]);
 
     // Handle answer selection
     const handleSelect = (questionId: number, option: TestOption) => {
