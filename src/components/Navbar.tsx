@@ -11,7 +11,7 @@ import {
     NavbarContent,
     NavbarItem
 } from '@heroui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiChevronDown, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import Link from 'next/link';
@@ -21,6 +21,11 @@ export default function TopNav() {
     const router = useRouter();
     const { user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        setUserRole(localStorage.getItem('userRole'));
+    }, []);
 
     return (
         <Navbar maxWidth="2xl" className="border-b border-gray-300 h-24 px-4 md:px-4 font-noto-sans">
@@ -41,7 +46,7 @@ export default function TopNav() {
             <NavbarContent className="hidden md:flex gap-10">
                 <Dropdown>
                     <DropdownTrigger>
-                        <Button variant="light">Cuộc hẹn <FiChevronDown size={20} /></Button>
+                        <Button variant="light">Cuộc hẹn</Button>
                     </DropdownTrigger>
                     <DropdownMenu>
                         <DropdownItem key="book-appointment">
@@ -55,7 +60,6 @@ export default function TopNav() {
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
-
                 <NavbarItem><Link href="/supporting-programs">Chương trình hỗ trợ</Link></NavbarItem>
                 <NavbarItem><Link href="/alltests">Bài kiểm tra</Link></NavbarItem>
                 <NavbarItem><Link href="/resources">Tài nguyên</Link></NavbarItem>
@@ -76,6 +80,11 @@ export default function TopNav() {
                             <DropdownItem key="profile">
                                 <Link href="/profile">Hồ sơ</Link>
                             </DropdownItem>
+                            {userRole !== 'Parent' ? (
+                                <DropdownItem key="history-program">
+                                    <Link href="/supporting-programs/programs-history">Lịch sử đăng kí</Link>
+                                </DropdownItem>
+                            ) : null}
                             <DropdownItem key="logout" onPress={logout} className="text-red-500">
                                 Đăng xuất
                             </DropdownItem>
@@ -113,6 +122,11 @@ export default function TopNav() {
                                 <DropdownItem key="profile">
                                     <Link href="/profile">Hồ sơ</Link>
                                 </DropdownItem>
+                                {userRole !== 'Parent' ? (
+                                    <DropdownItem key="history-program">
+                                        <Link href="/supporting-programs/programs-history">Lịch sử đăng kí</Link>
+                                    </DropdownItem>
+                                ) : null}
                                 <DropdownItem key="logout" onPress={logout} className="text-red-500">
                                     Đăng xuất
                                 </DropdownItem>

@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Card, CardBody, Button, Spinner, Image } from "@heroui/react";
-import { Toaster, toast } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
 import { RiInformation2Fill } from "react-icons/ri";
+import { registerForProgram } from '@/lib/utils';
 
 interface SupportingProgram {
     id: number;
@@ -53,33 +54,13 @@ export default function ProgramDetail() {
         fetchProgramDetails();
     }, [id]);
 
-    const handleRegister = async () => {
-        try {
-            const response = await fetch(`https://localhost:7096/api/v1/supporting-programs/register`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ programId: program?.id }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Registration failed');
-            }
-
-            toast.success('Registration succeeded!');
-        } catch (error) {
-            toast.error('Registration failed. Please try again.');
-            console.error('Error registering:', error);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-gray-100">
             <Toaster position="top-center" reverseOrder={false} />
             <div className="flex justify-center py-10 bg-gradient-to-r from-purple-500 to-indigo-600">
-                <h1 className="flex items-center gap-2 text-4xl font-bevnpro font-bold text-white"><RiInformation2Fill /> Program Details</h1>
+                <h1 className="flex items-center gap-2 text-4xl font-bevnpro font-bold text-white">
+                    <RiInformation2Fill /> Program Details
+                </h1>
             </div>
 
             {loading ? (
@@ -91,7 +72,6 @@ export default function ProgramDetail() {
                     <Card className="shadow-lg rounded-lg">
                         <Image src={program.thumbnailUrl} alt={program.title} className="w-full h-60 object-cover rounded-t-lg" />
                         <CardBody className="p-6">
-
                             <div className="mt-3 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-gray-500" />
                                 <span className="text-gray-600">{program.street}, {program.city}, {program.ward}, {program.province}</span>
@@ -108,7 +88,7 @@ export default function ProgramDetail() {
                                 <Button color="primary" variant="bordered" className="w-full" onPress={() => router.push('/supporting-programs')}>
                                     Back to List
                                 </Button>
-                                <Button color="success" className="w-full" onPress={handleRegister}>
+                                <Button color="success" className="w-full" onPress={() => registerForProgram(program.id)}>
                                     Register Program
                                 </Button>
                             </div>
