@@ -48,7 +48,7 @@ export default function LoginForm() {
     return (
         <div className="flex min-h-screen">
             <div className="hidden md:flex w-1/2 bg-cover bg-center" 
-                style={{ backgroundImage: "url('https://res.cloudinary.com/ddewgbug1/image/upload/v1741272595/zvzarkuxvt4jmfscpfji.avif')" }}>
+                style={{ backgroundImage: "url('https://res.cloudinary.com/ddewgbug1/image/upload/v1741431645/pomogpovlunvp23f1g8s.avif')" }}>
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gray-100 p-8">

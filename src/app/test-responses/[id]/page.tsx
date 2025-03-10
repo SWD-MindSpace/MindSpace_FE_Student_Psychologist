@@ -75,6 +75,9 @@ export default function TestResponseDetail() {
                         <Button color="primary" className="mt-4" onPress={() => router.push("/")}>
                             Quay lại trang chủ
                         </Button>
+                        <Button color="primary" className="mt-4" onPress={() => router.push("/")}>
+                            Đặt một cuộc hẹn với nhà tâm lý
+                        </Button>
                     </div>
                 </CardBody>
             </Card>
