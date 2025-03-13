@@ -15,7 +15,7 @@ export default function LoginForm() {
     const [type, setType] = useState<'password' | 'text'>('password');
     const [error, setError] = useState('');
 
-    const API_URL = 'https://localhost:7096/api/v1/identity/login';
+    const API_URL = 'https://localhost:7096/api/v1/identities/login';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
