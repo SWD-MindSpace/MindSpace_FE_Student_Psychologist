@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader, Button, Avatar } from '@heroui/react';
 
-const API_URL = 'https://localhost:7096/api/v1/identity/profile/';
+const API_URL = 'https://localhost:7096/api/v1/identities/profile/';
 
 interface UserProfile {
     email: string;
@@ -70,9 +70,9 @@ export default function Profile() {
                     {profile ? (
                         <>
                             <div className="relative">
-                                <Avatar 
-                                    src={profile.imageUrl || '/default-avatar.png'} 
-                                    size="lg" 
+                                <Avatar
+                                    src={profile.imageUrl || '/default-avatar.png'}
+                                    size="lg"
                                     className="border-4 border-white shadow-lg rounded-full"
                                 />
                             </div>

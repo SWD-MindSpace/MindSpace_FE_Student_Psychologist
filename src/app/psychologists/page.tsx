@@ -2,6 +2,7 @@
 
 import { Divider, Image } from '@heroui/react';
 import React from 'react'
+// query list of psychologists with filters
 
 export default function page() {
     const psychologists = [
