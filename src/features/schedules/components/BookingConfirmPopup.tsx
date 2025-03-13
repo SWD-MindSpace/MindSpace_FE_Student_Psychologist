@@ -19,7 +19,7 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
 }) => {
     const [specialization, setSpecialization] = useState('');
 
-    // get from constants
+    // get from api
     const specializations = [
         { id: '1', name: 'General Medicine' },
         { id: '2', name: 'Cardiology' },
@@ -30,7 +30,7 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
 
     const handleConfirm = () => {
         if (!specialization) {
-            alert('Please select a specialization');
+            alert('Hãy chọn 1 lĩnh vực cụ thể');
             return;
         }
         onConfirm({
@@ -45,23 +45,23 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
     return (
         <div className={styles.popupOverlay}>
             <div className={styles.popupContent}>
-                <h2>Confirm Appointment</h2>
+                <h2>Xác nhận đặt lịch</h2>
 
                 {selectedSlot && (
                     <div className={styles.appointmentDetails}>
-                        <p>Date: {selectedSlot.date}</p>
-                        <p>Time: {selectedSlot.startTime} - {selectedSlot.endTime}</p>
+                        <p>Ngày: {selectedSlot.date}</p>
+                        <p>Giờ: {selectedSlot.startTime} - {selectedSlot.endTime}</p>
                     </div>
                 )}
 
                 <div className={styles.specializationSelector}>
-                    <label htmlFor="specialization">Select Specialization:</label>
+                    <label htmlFor="specialization">Chọn lĩnh vực cần tư vấn:</label>
                     <select
                         id="specialization"
                         value={specialization}
                         onChange={(e) => setSpecialization(e.target.value)}
                     >
-                        <option value="">-- Select a specialization --</option>
+                        <option value="">-- Chọn 1 lĩnh vực --</option>
                         {specializations.map(spec => (
                             <option key={spec.id} value={spec.id}>
                                 {spec.name}
@@ -75,13 +75,13 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
                         className={styles.cancelButton}
                         onClick={onClose}
                     >
-                        Cancel
+                        Đóng
                     </button>
                     <button
                         className={styles.confirmButton}
                         onClick={handleConfirm}
                     >
-                        Confirm Appointment
+                        Xác nhận đặt lịch
                     </button>
                 </div>
             </div>
