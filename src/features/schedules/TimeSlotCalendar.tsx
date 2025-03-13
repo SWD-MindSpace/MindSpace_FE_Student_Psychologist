@@ -126,12 +126,12 @@ export default function TimeSlotCalendar() {
 
     const dateStr = selectedDay.toISOString().split('T')[0];
     if (slot.status !== undefined && slot.status > 0) {
-      alert('This slot has been booked and cannot be selected.');
+      alert('Khung giờ này đã được đặt nên bạn không thể đặt nữa!');
       return;
     }
 
     if (!isTimeValidForScheduling(dateStr, slot.startTime)) {
-      alert('You can only schedule slots from 15 minutes after the current time.');
+      alert('Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!');
       return;
     }
 
@@ -170,7 +170,7 @@ export default function TimeSlotCalendar() {
     specialization: string
   }) => {
     if (!data.slot) {
-      alert('Error: No time slot selected');
+      alert('Lỗi: Không có khung giờ nào được chọn');
       return;
     }
 
@@ -223,10 +223,10 @@ export default function TimeSlotCalendar() {
 
   return (
     <div className={styles.calendarContainer}>
-      <h2 className={styles.calendarTitle}>Schedules</h2>
+      <h2 className={styles.calendarTitle}>Khung giờ làm việc</h2>
 
       <div className={styles.datePickerContainer}>
-        <label className={styles.dateLabel}>Choose a date: </label>
+        <label className={styles.dateLabel}>Chọn 1 ngày: </label>
         <DatePicker
           selected={selectedDay}
           onChange={(date: Date | null) => {
@@ -235,7 +235,7 @@ export default function TimeSlotCalendar() {
               setSlotsFromApi([]);
               setSelectedTimeslot(undefined);
             } else {
-              alert('Please select a day.');
+              alert('Vui lòng chọn 1 ngày cụ thể.');
             }
           }}
           dateFormat="dd/MM/yyyy"
@@ -256,7 +256,7 @@ export default function TimeSlotCalendar() {
         {selectedDay && (
           <div className={styles.slotsContainer}>
             <h3 className={styles.slotsTitle}>
-              Time Slots for {selectedDay.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}
+              Các khung giờ trong ngày {selectedDay.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'short' })}
             </h3>
             <div className={styles.slotsGrid}>
               {generateSlots(selectedDay).map((slot, index) => {
