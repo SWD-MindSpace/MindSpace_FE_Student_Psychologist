@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { FiChevronDown, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { motion } from 'framer-motion';
 
 export default function TopNav() {
     const router = useRouter();
@@ -28,10 +29,19 @@ export default function TopNav() {
     }, []);
 
     return (
-        <Navbar maxWidth="2xl" className="border-b border-gray-300 h-24 px-4 md:px-4 font-noto-sans">
+        <Navbar maxWidth="2xl" className="border-b border-gray-300 h-24 px-4 shadow-md md:px-4 font-noto-sans">
             <div className="flex justify-between items-center w-full">
                 <NavbarBrand className="gap-2">
-                    <Link href="/" className="text-3xl font-bold font-bevnpro">MindSpace</Link>
+                    <motion.div
+                        whileHover={{
+                            y: [-4, 4, -4, 0], // Moves up and down for a bouncing effect
+                            transition: { duration: 1, repeat: Infinity, repeatType: "reverse" },
+                        }}
+                    >
+                        <Link href="/" className="text-3xl font-bold font-bevnpro">
+                            MindSpace
+                        </Link>
+                    </motion.div>
                 </NavbarBrand>
 
                 {/* Mobile Menu Toggle */}
@@ -60,11 +70,11 @@ export default function TopNav() {
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
-                <NavbarItem><Link href="/supporting-programs">Chương trình hỗ trợ</Link></NavbarItem>
-                <NavbarItem><Link href="/alltests">Bài kiểm tra</Link></NavbarItem>
-                <NavbarItem><Link href="/resources">Tài nguyên</Link></NavbarItem>
-                <NavbarItem><Link href="/psychologists">Chuyên gia tâm lí</Link></NavbarItem>
-                <NavbarItem><Link href="/about-us">Về chúng tôi</Link></NavbarItem>
+                <NavbarItem><Link href="/supporting-programs" className='hover:text-secondary-blue transition-all'>Chương trình hỗ trợ</Link></NavbarItem>
+                <NavbarItem><Link href="/alltests" className='hover:text-secondary-blue transition-all'>Bài kiểm tra</Link></NavbarItem>
+                <NavbarItem><Link href="/resources" className='hover:text-secondary-blue transition-all'>Tài nguyên</Link></NavbarItem>
+                <NavbarItem><Link href="/psychologists" className='hover:text-secondary-blue transition-all'>Chuyên gia tâm lí</Link></NavbarItem>
+                <NavbarItem><Link href="/about-us" className='hover:text-secondary-blue transition-all'>Về chúng tôi</Link></NavbarItem>
             </NavbarContent>
 
             {/* User Actions (Desktop) */}

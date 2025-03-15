@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader, Image, Button, Divider } from "@heroui/reac
 import { GrUserExpert } from "react-icons/gr";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { MdModelTraining } from "react-icons/md";
+import MotionHeading from "@/components/MotionHeading";
 
 export default function Home() {
     const psychologists = [
@@ -68,14 +69,33 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-800">
-            <section className="bg-secondary-blue text-white py-24 text-center font-noto-sans">
-                <h1 className="text-5xl font-extrabold font-bevnpro">Welcome to MindSpace</h1>
-                <p className="mt-4 text-xl">Your journey to mental well-being starts here.</p>
-                <Link href="/appointments">
-                    <Button className="mt-6 px-8 py-3 text-lg font-semibold shadow-lg transition-transform hover:scale-105">
-                        Book an Appointment
-                    </Button>
-                </Link>
+            <section className="relative bg-secondary-blue text-white py-28 text-center font-noto-sans overflow-hidden shadow-sm shadow-black">
+                {/* Background Video */}
+                <video
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                >
+                    <source src="https://res.cloudinary.com/ddewgbug1/video/upload/v1741977745/pg2y7f8da85pyuwj86lz.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+
+                {/* Content */}
+                <div className="relative z-10">
+                    <MotionHeading className="text-5xl">
+                        Chào mừng tới với MindSpace
+                    </MotionHeading>
+                    <MotionHeading className="text-xl font-noto-sans mt-4" delay={0.5}>
+                        Hành trình đến với sức khỏe tinh thần của bạn bắt đầu từ đây.
+                    </MotionHeading>
+                    <Link href="/appointments">
+                        <Button className="mt-6 px-8 py-3 text-lg font-semibold shadow-lg transition-transform hover:scale-105">
+                            Đặt một cuộc hẹn
+                        </Button>
+                    </Link>
+                </div>
             </section>
 
             <section className="container mx-auto my-24 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -107,7 +127,9 @@ export default function Home() {
                 </div>
 
                 <div className="w-full md:w-1/2">
-                    <h2 className="text-4xl font-bold text-secondary-blue font-bevnpro">Scale & Expand Mental Health Services</h2>
+                    <MotionHeading className="text-secondary-blue">
+                        Scale & Expand Mental Health Services
+                    </MotionHeading>
                     <p className="text-gray-600 mt-4">
                         MindSpace eliminates wait times for mental health support and reduces overwhelming caseloads for counseling center staff.
                     </p>
@@ -129,9 +151,9 @@ export default function Home() {
             </section>
 
             <section className="container mx-auto my-36 px-6 font-noto-sans">
-                <h2 className="text-4xl font-bold font-bevnpro text-center text-secondary-blue mb-6">
+                <MotionHeading className="text-center text-secondary-blue mb-6">
                     Meet Our Expert Psychologists
-                </h2>
+                </MotionHeading>
                 <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
                     Our team of licensed psychologists is dedicated to providing compassionate care,
                     offering evidence-based therapies tailored to your needs.
@@ -168,10 +190,12 @@ export default function Home() {
 
             <section className="container mx-auto my-24 px-6 font-noto-sans">
                 <div className="text-center leading-relaxed space-y-4">
-                    <h1 className="text-4xl text-secondary-blue font-bevnpro">Supporting <strong>Faculty & Staff</strong></h1>
-                    <p className="text-gray-600 text-lg">
+                    <MotionHeading className="text-secondary-blue">
+                        Supporting <strong>Faculty & Staff</strong>
+                    </MotionHeading>
+                    <MotionHeading className="text-gray-600 text-lg font-noto-sans" delay={0.5}>
                         MindSpace provides unique content, tools, guides, and training for your faculty and staff.
-                    </p>
+                    </MotionHeading>
                     <Divider className="w-1/2 mx-auto" />
                 </div>
 
