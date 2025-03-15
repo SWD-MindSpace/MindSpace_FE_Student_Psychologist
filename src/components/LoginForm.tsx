@@ -6,6 +6,7 @@ import { Input, Button, Card, CardBody, CardHeader, Divider } from "@heroui/reac
 import { FiMail, FiLock } from 'react-icons/fi';
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useAuth } from '@/context/AuthContext';
+import MotionHeading from './MotionHeading';
 
 export default function LoginForm() {
     const { login } = useAuth();
@@ -38,8 +39,8 @@ export default function LoginForm() {
             console.log("ID Token:", id_token);
             console.log("Access Token:", access_token);
 
-            login({ id_token, access_token }); 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            login({ id_token, access_token });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             setError(err.message || 'Something went wrong');
         }
@@ -47,14 +48,14 @@ export default function LoginForm() {
 
     return (
         <div className="flex min-h-screen">
-            <div className="hidden md:flex w-1/2 bg-cover bg-center" 
+            <div className="hidden md:flex w-1/2 bg-cover bg-center"
                 style={{ backgroundImage: "url('https://res.cloudinary.com/ddewgbug1/image/upload/v1741431645/pomogpovlunvp23f1g8s.avif')" }}>
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gray-100 p-8">
-                <div className="text-4xl font-bold font-bevnpro text-indigo-600 mb-6">
-                    MindSpace 
-                </div>
+                <MotionHeading className='text-sky-600 mb-6'>
+                    MindSpace
+                </MotionHeading>
 
                 <Card className="w-[400px] p-8 rounded-xl shadow-lg bg-white">
                     <CardHeader className="text-2xl font-bold text-center text-gray-800">
@@ -80,7 +81,7 @@ export default function LoginForm() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 startContent={<FiLock size={20} className="text-gray-500" />}
                                 endContent={
-                                    <span className="cursor-pointer text-gray-500 hover:text-indigo-500" 
+                                    <span className="cursor-pointer text-gray-500 hover:text-indigo-500"
                                         onClick={() => setType(type === 'password' ? 'text' : 'password')}>
                                         {type === 'password' ? <FaRegEyeSlash size={20} /> : <FaRegEye size={20} />}
                                     </span>

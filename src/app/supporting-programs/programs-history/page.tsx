@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Spinner, Card, CardBody, Image, Pagination } from "@heroui/react";
 import { FaMapMarkerAlt, FaCalendarAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { TbHttpPost } from "react-icons/tb";
 import { Toaster, toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 interface RegisteredProgram {
@@ -25,7 +26,7 @@ export default function ProgramHistory() {
     const [loading, setLoading] = useState(true);
     const [pageIndex, setPageIndex] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 4;
+    const pageSize = 6;
 
     useEffect(() => {
         const accessToken = localStorage.getItem("accessToken");
@@ -38,7 +39,7 @@ export default function ProgramHistory() {
             setLoading(true);
             try {
                 const response = await fetch(
-                    `https://localhost:7096/api/v1/supporting-programs/history?StudentId=${userId}&pageIndex=${pageIndex}&pageSize=${pageSize}`,
+                    `https://localhost:7096/api/v1/supporting-programs/history?StudentId=${userId}&pageIndex=${pageIndex}&pageSize=${pageSize}&Sort=joinedAtDesc`,
                     {
                         method: 'GET',
                         headers: {
@@ -96,6 +97,9 @@ export default function ProgramHistory() {
                                                 </p>
                                                 <p className="text-gray-600 text-lg flex items-center">
                                                     <FaCalendarAlt className="mr-2" /> {new Date(program.startDateAt).toLocaleDateString()}
+                                                </p>
+                                                <p className="text-gray-600 text-lg flex items-center">
+                                                    <TbHttpPost className="mr-2" /> {program.postalCode}
                                                 </p>
                                                 <p className="font-semibold flex items-center">
                                                     {program.isActive ? (

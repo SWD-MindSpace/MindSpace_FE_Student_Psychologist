@@ -71,11 +71,11 @@ export default function TestResponseDetail() {
                             <p className="text-xs font-semibold">Câu trả lời: {item.answerText}</p>
                         </div>
                     ))}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center gap-4 font-noto-sans">
                         <Button color="primary" className="mt-4" onPress={() => router.push("/")}>
                             Quay lại trang chủ
                         </Button>
-                        <Button color="primary" className="mt-4" onPress={() => router.push("/")}>
+                        <Button color="secondary" className="mt-4" onPress={() => router.push("/")}>
                             Đặt một cuộc hẹn với nhà tâm lý
                         </Button>
                     </div>

@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const accessToken = localStorage.getItem('accessToken');
             if (accessToken) {
-                await fetch('https://localhost:7096/api/v1/identity/logout', {
+                await fetch('https://localhost:7096/api/v1/identities/logout', {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('userId');
         localStorage.removeItem('userRole');
         setUser(null);
-        router.push('/login');
+        router.push('/');
     }, [router]);
 
     const isTokenExpired = (token: string): boolean => {

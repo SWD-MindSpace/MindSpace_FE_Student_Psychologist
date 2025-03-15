@@ -6,6 +6,7 @@ import { Divider, Image, Spinner, Card, CardBody } from '@heroui/react';
 import { HiAcademicCap, HiUser, HiOutlineDocumentText } from 'react-icons/hi';
 import Link from 'next/link';
 import { FaArrowRight } from 'react-icons/fa';
+import MotionHeading from '@/components/MotionHeading';
 
 interface Section {
   heading: string;
@@ -83,12 +84,12 @@ export default function BlogDetailPage() {
   return (
     <div className="min-h-screen p-6 max-w-5xl mx-auto">
       <div className="flex flex-col items-center justify-center gap-5 mb-4">
-        <h1 className="flex items-center text-4xl font-extrabold text-transparent bg-clip-text 
+        <MotionHeading className='flex items-center text-4xl font-extrabold text-transparent bg-clip-text 
                  bg-gradient-to-r from-secondary-blue to-primary-blue 
-                 font-bevnpro leading-tight gap-2">
+                 font-bevnpro leading-tight gap-2'>
           <HiOutlineDocumentText className="text-5xl text-secondary-blue" />
           {blog.title}
-        </h1>
+        </MotionHeading>
         <div className="flex items-center py-2 gap-4 font-bevnpro cursor-pointer"
           onClick={() => router.push('/resources')}
         >
@@ -127,7 +128,7 @@ export default function BlogDetailPage() {
         </div>
       ))}
 
-      <Divider className='h-1 mt-10 bg-sky-700 rounded-md'/> 
+      <Divider className='h-1 mt-10 bg-sky-700 rounded-md' />
 
       <div className="mt-12">
         <h2 className="text-3xl font-extrabold text-gray-800 text-center mb-6">More to Explore</h2>
