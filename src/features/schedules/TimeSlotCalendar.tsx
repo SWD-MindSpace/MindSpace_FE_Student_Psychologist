@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import styles from './styles/TimeslotCalendar.module.css';
-import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from './schemas/ScheduleSchemas'
-import ConfirmAppointmentPopup from './components/BookingConfirmPopup';
+import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import styles from "./styles/TimeslotCalendar.module.css";
+import {
+  TimeSlotFromApi,
+  ScheduleResponse,
+  TimeSlotToApi,
+} from "./schemas/ScheduleSchemas";
+import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 
 const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
+const bookingUrl = `https://localhost:7096/api/v1/appointments/booking/confirm`;
 
 export default function TimeSlotCalendar() {
   const psychologistId = 8; // thay bằng get từ url gì đó bên list qua
@@ -21,9 +26,9 @@ export default function TimeSlotCalendar() {
 
   // Parse URL params for dates on component mount
   const parseUrlParams = (): { startDate: Date | null } => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const minDateParam = urlParams.get('minDate');
+      const minDateParam = urlParams.get("minDate");
 
       if (minDateParam) {
         const parsedDate = new Date(minDateParam);
@@ -52,41 +57,48 @@ export default function TimeSlotCalendar() {
   // Fetch slots from API for the chosen date
   useEffect(() => {
     if (selectedDay) {
-      const startDateStr = selectedDay.toISOString().split('T')[0];
+      const startDateStr = selectedDay.toISOString().split("T")[0];
 
       // Log the fetch request
       console.log(`Fetching data for date: ${startDateStr}`);
 
-      fetch(`${baseUrl}?PsychologistId=${psychologistId}&MinDate=${startDateStr}&MaxDate=${startDateStr}&Status=0`) // Put 0 to the constants PsychologistScheduleStatus
+      fetch(
+        `${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`
+      ) // Put 0 to the constants PsychologistScheduleStatus
         .then((response) => response.json())
         .then((data: ScheduleResponse) => {
           const allSlots = data.flatMap((item) => item.timeSlots);
           setSlotsFromApi(allSlots);
           console.log(`Fetched slots for date ${startDateStr}`, allSlots);
         })
-        .catch((error) => console.error('Error fetching schedule:', error));
+        .catch((error) => console.error("Error fetching schedule:", error));
     }
   }, [selectedDay, psychologistId]);
 
   // Kiểm tra slot book lịch mới (ít nhất 15 phút sau hiện tại, GMT+7)
-  const isTimeValidForScheduling = (dateStr: string, startTime: string): boolean => {
+  const isTimeValidForScheduling = (
+    dateStr: string,
+    startTime: string
+  ): boolean => {
     const now = new Date();
     const minimumScheduleTime = new Date(now.getTime() + 15 * 60 * 1000);
-    const [hours, minutes] = startTime.split(':').map(Number);
+    const [hours, minutes] = startTime.split(":").map(Number);
     const slotTime = new Date(dateStr);
     slotTime.setHours(hours, minutes, 0, 0);
     return slotTime >= minimumScheduleTime;
   };
 
   // Tạo danh sách slot tĩnh từ 00:00 đến 23:30
-  const generateSlots = (date: Date): { startTime: string; endTime: string; status?: number }[] => {
+  const generateSlots = (
+    date: Date
+  ): { startTime: string; endTime: string; status?: number }[] => {
     const slots: { startTime: string; endTime: string; status?: number }[] = [];
     let currentHour = 0;
     let currentMinute = 0;
 
     while (currentHour < 24) {
-      const startHour = currentHour.toString().padStart(2, '0');
-      const startMinute = currentMinute.toString().padStart(2, '0');
+      const startHour = currentHour.toString().padStart(2, "0");
+      const startMinute = currentMinute.toString().padStart(2, "0");
       const startTime = `${startHour}:${startMinute}`;
 
       let endHour = currentHour;
@@ -99,11 +111,16 @@ export default function TimeSlotCalendar() {
         endHour = 23;
         endMinute = 59;
       }
-      const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
-      const dateStr = date.toISOString().split('T')[0];
+      const endTime = `${endHour.toString().padStart(2, "0")}:${endMinute
+        .toString()
+        .padStart(2, "0")}`;
+      const dateStr = date.toISOString().split("T")[0];
 
       const apiSlot = slotsFromApi.find(
-        (s) => s.date === dateStr && s.startTime === startTime && s.endTime === endTime
+        (s) =>
+          s.date === dateStr &&
+          s.startTime === startTime &&
+          s.endTime === endTime
       );
       const status = apiSlot ? apiSlot.status : undefined;
 
@@ -118,34 +135,43 @@ export default function TimeSlotCalendar() {
     return slots;
   };
 
-  const handleSlotClick = (slot: { startTime: string; endTime: string; status?: number }) => {
+  const handleSlotClick = (slot: {
+    startTime: string;
+    endTime: string;
+    status?: number;
+  }) => {
     if (!selectedDay) {
       console.log(selectedDay);
       return;
     }
 
-    const dateStr = selectedDay.toISOString().split('T')[0];
+    const dateStr = selectedDay.toISOString().split("T")[0];
     if (slot.status !== undefined && slot.status > 0) {
-      alert('Khung giờ này đã được đặt nên bạn không thể đặt nữa!');
+      alert("Khung giờ này đã được đặt nên bạn không thể đặt nữa!");
       return;
     }
 
     if (!isTimeValidForScheduling(dateStr, slot.startTime)) {
-      alert('Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!');
+      alert(
+        "Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!"
+      );
       return;
     }
 
     // Find the corresponding slot from API to get its ID
     const apiSlot = slotsFromApi.find(
-      (s) => s.date === dateStr && s.startTime === slot.startTime && s.endTime === slot.endTime
+      (s) =>
+        s.date === dateStr &&
+        s.startTime === slot.startTime &&
+        s.endTime === slot.endTime
     );
 
     const slotToBook = {
-      id: apiSlot?.id,  // Include the id from the API data
+      id: apiSlot?.id, // Include the id from the API data
       startTime: slot.startTime,
       endTime: slot.endTime,
       date: dateStr,
-      status: slot.status
+      status: slot.status,
     };
 
     openConfirmPopup(slotToBook);
@@ -153,7 +179,10 @@ export default function TimeSlotCalendar() {
 
   // Xử lý khi nhấp vào slot để đặt lịch => bấm vô hiện ra popup chọn specialization và thông tin lịch + confirm đặt lịch
   const openConfirmPopup = (slot: {
-    startTime: string; endTime: string; date: string, status: number | undefined
+    startTime: string;
+    endTime: string;
+    date: string;
+    status: number | undefined;
   }) => {
     // Don't open popup if slot is already booked
     if (slot.status != undefined && slot.status > 0) {
@@ -162,50 +191,65 @@ export default function TimeSlotCalendar() {
 
     setSelectedTimeslot(slot);
     setIsConfirmPopupOpen(true);
-  }
+  };
 
   // Trong component TimeSlotCalendar
-  const handleConfirmAppointment = (data: {
+  const handleConfirmAppointment = async (data: {
     slot: TimeSlotToApi | undefined;
-    specialization: string
+    specializationId: number;
   }) => {
     if (!data.slot) {
-      alert('Lỗi: Không có khung giờ nào được chọn');
+      alert("Lỗi: Không có khung giờ nào được chọn");
+      return;
+    }
+
+    // Retrieve studentId from localStorage
+    const studentId = localStorage.getItem("userId");
+    if (!studentId) {
+      alert("Lỗi: Không có studentId");
       return;
     }
 
     // Tạo object chứa tất cả thông tin đặt lịch
     const bookingData = {
-      slotId: data.slot.id,
+      scheduleId: data.slot.id,
       date: data.slot.date,
       startTime: data.slot.startTime,
       endTime: data.slot.endTime,
-      specialization: data.specialization,
-      psychologistId: psychologistId
+      specializationId: data.specializationId,
+      psychologistId: psychologistId,
+      studentId: parseInt(studentId),
     };
 
     // Alert thông tin đặt lịch
     alert(
-      'Booking Information:\n\n' +
-      `Date: ${bookingData.date}\n` +
-      `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
-      `Specialization ID: ${bookingData.specialization}\n` +
-      `Psychologist ID: ${bookingData.psychologistId}\n` +
-      `Slot ID: ${bookingData.slotId || 'Not available'}`
+      "Booking Information:\n\n" +
+        `Date: ${bookingData.date}\n` +
+        `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
+        `Specialization ID: ${bookingData.specializationId}\n` +
+        `Psychologist ID: ${bookingData.psychologistId}\n` +
+        `Slot ID: ${bookingData.scheduleId || "Not available"}`
     );
 
+    await handleStripePayment(bookingData);
     // Sau này khi tích hợp thanh toán, gọi API ở đây
-    console.log('Booking data:', bookingData);
-
+    console.log("Booking data:", bookingData);
   };
 
   // Hàm xác định class style cho slot dựa trên trạng thái
-  const getSlotClassName = (slot: { startTime: string; endTime: string; status?: number }, selectedDay: Date | null) => {
+  const getSlotClassName = (
+    slot: { startTime: string; endTime: string; status?: number },
+    selectedDay: Date | null
+  ) => {
     if (!selectedDay) return styles.slotItem;
 
-    const dateStr = selectedDay.toISOString().split('T')[0];
+    const dateStr = selectedDay.toISOString().split("T")[0];
 
-    const isSelected = (selectedTimeslot != null && selectedTimeslot.date === dateStr && selectedTimeslot.startTime === slot.startTime && selectedTimeslot.endTime === slot.endTime);
+    const isSelected =
+      selectedTimeslot != null &&
+      selectedTimeslot.date === dateStr &&
+      selectedTimeslot.startTime === slot.startTime &&
+      selectedTimeslot.endTime === slot.endTime;
 
     if (slot.status !== undefined && slot.status > 0) {
       return `${styles.slotItem} ${styles.booked}`;
@@ -235,14 +279,13 @@ export default function TimeSlotCalendar() {
               setSlotsFromApi([]);
               setSelectedTimeslot(undefined);
             } else {
-              alert('Vui lòng chọn 1 ngày cụ thể.');
+              alert("Vui lòng chọn 1 ngày cụ thể.");
             }
           }}
           dateFormat="dd/MM/yyyy"
           minDate={new Date()}
           className={styles.datePicker}
         />
-
       </div>
 
       <ConfirmAppointmentPopup
@@ -256,7 +299,12 @@ export default function TimeSlotCalendar() {
         {selectedDay && (
           <div className={styles.slotsContainer}>
             <h3 className={styles.slotsTitle}>
-              Các khung giờ trong ngày {selectedDay.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'short' })}
+              Các khung giờ trong ngày{" "}
+              {selectedDay.toLocaleDateString("vi-VN", {
+                weekday: "long",
+                day: "numeric",
+                month: "short",
+              })}
             </h3>
             <div className={styles.slotsGrid}>
               {generateSlots(selectedDay).map((slot, index) => {
@@ -266,7 +314,7 @@ export default function TimeSlotCalendar() {
                     key={index}
                     onClick={() => !isBooked && handleSlotClick(slot)}
                     className={getSlotClassName(slot, selectedDay)}
-                    style={{ cursor: isBooked ? 'not-allowed' : 'pointer' }}
+                    style={{ cursor: isBooked ? "not-allowed" : "pointer" }}
                   >
                     {slot.startTime} - {slot.endTime}
                   </div>
@@ -278,4 +326,41 @@ export default function TimeSlotCalendar() {
       </div>
     </div>
   );
+}
+
+async function handleStripePayment(bookingData: {
+  scheduleId: number | undefined;
+  date: string;
+  startTime: string;
+  endTime: string;
+  specializationId: number;
+  psychologistId: number;
+  studentId: number;
+}) {
+  // temp variable, remove later
+  const data = {
+    scheduleId: bookingData.scheduleId,
+    studentId: bookingData.studentId,
+    specializationId: bookingData.specializationId,
+    psychologistId: bookingData.psychologistId,
+  };
+  //
+  console.log(data);
+
+  const response = await fetch(`${bookingUrl}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const responseData: PaymentResponse = await response.json();
+
+  localStorage.setItem("sessionId", responseData.sessionId);
+  window.location.href = responseData.sessionUrl;
+}
+
+interface PaymentResponse {
+  sessionUrl: string;
+  sessionId: string;
 }
