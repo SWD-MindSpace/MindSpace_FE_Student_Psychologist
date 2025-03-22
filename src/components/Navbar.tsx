@@ -13,7 +13,7 @@ import {
 } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiChevronDown, FiMenu, FiX, FiUser } from 'react-icons/fi';
+import { FiChevronDown, FiMenu, FiX, FiUser, FiVideo } from 'react-icons/fi';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
@@ -75,6 +75,14 @@ export default function TopNav() {
                 <NavbarItem><Link href="/resources" className='hover:text-secondary-blue transition-all'>Tài nguyên</Link></NavbarItem>
                 <NavbarItem><Link href="/psychologists" className='hover:text-secondary-blue transition-all'>Chuyên gia tâm lí</Link></NavbarItem>
                 <NavbarItem><Link href="/about-us" className='hover:text-secondary-blue transition-all'>Về chúng tôi</Link></NavbarItem>
+                {user && (
+                    <NavbarItem>
+                        <Link href="/video-chat" className='flex items-center gap-2 hover:text-secondary-blue transition-all'>
+                            <FiVideo size={18} />
+                            Video Chat
+                        </Link>
+                    </NavbarItem>
+                )}
             </NavbarContent>
 
             {/* User Actions (Desktop) */}
@@ -120,6 +128,12 @@ export default function TopNav() {
                     <Link href="/resources" className="py-2 text-center">Tài nguyên</Link>
                     <Link href="/psychologists" className="py-2 text-center">Chuyên gia tâm lí</Link>
                     <Link href="/about-us" className="py-2 text-center">Về chúng tôi</Link>
+                    {user && (
+                        <Link href="/video-chat" className="py-2 text-center flex items-center justify-center gap-2">
+                            <FiVideo size={18} />
+                            Video Chat
+                        </Link>
+                    )}
 
                     {user ? (
                         <Dropdown>

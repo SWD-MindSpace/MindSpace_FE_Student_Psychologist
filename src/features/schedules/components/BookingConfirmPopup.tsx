@@ -7,10 +7,7 @@ interface ConfirmAppointmentPopupProps {
   isOpen: boolean;
   onClose: () => void;
   selectedSlot: TimeSlotToApi | undefined;
-  onConfirm: (data: {
-    slot: TimeSlotToApi | undefined;
-    specializationId: number;
-  }) => void;
+  onConfirm: (data: { slot: TimeSlotToApi | undefined; specializationId: number }) => void;
 }
 
 // Sử dụng interface trong component

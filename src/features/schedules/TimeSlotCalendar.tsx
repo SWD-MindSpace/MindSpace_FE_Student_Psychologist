@@ -4,11 +4,7 @@ import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./styles/TimeslotCalendar.module.css";
-import {
-  TimeSlotFromApi,
-  ScheduleResponse,
-  TimeSlotToApi,
-} from "./schemas/ScheduleSchemas";
+import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/ScheduleSchemas";
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 
 const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
@@ -62,9 +58,7 @@ export default function TimeSlotCalendar() {
       // Log the fetch request
       console.log(`Fetching data for date: ${startDateStr}`);
 
-      fetch(
-        `${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`
-      ) // Put 0 to the constants PsychologistScheduleStatus
+      fetch(`${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`) // Put 0 to the constants PsychologistScheduleStatus
         .then((response) => response.json())
         .then((data: ScheduleResponse) => {
           const allSlots = data.flatMap((item) => item.timeSlots);
@@ -76,10 +70,7 @@ export default function TimeSlotCalendar() {
   }, [selectedDay, psychologistId]);
 
   // Kiểm tra slot book lịch mới (ít nhất 15 phút sau hiện tại, GMT+7)
-  const isTimeValidForScheduling = (
-    dateStr: string,
-    startTime: string
-  ): boolean => {
+  const isTimeValidForScheduling = (dateStr: string, startTime: string): boolean => {
     const now = new Date();
     const minimumScheduleTime = new Date(now.getTime() + 15 * 60 * 1000);
     const [hours, minutes] = startTime.split(":").map(Number);
@@ -89,9 +80,7 @@ export default function TimeSlotCalendar() {
   };
 
   // Tạo danh sách slot tĩnh từ 00:00 đến 23:30
-  const generateSlots = (
-    date: Date
-  ): { startTime: string; endTime: string; status?: number }[] => {
+  const generateSlots = (date: Date): { startTime: string; endTime: string; status?: number }[] => {
     const slots: { startTime: string; endTime: string; status?: number }[] = [];
     let currentHour = 0;
     let currentMinute = 0;
@@ -111,16 +100,11 @@ export default function TimeSlotCalendar() {
         endHour = 23;
         endMinute = 59;
       }
-      const endTime = `${endHour.toString().padStart(2, "0")}:${endMinute
-        .toString()
-        .padStart(2, "0")}`;
+      const endTime = `${endHour.toString().padStart(2, "0")}:${endMinute.toString().padStart(2, "0")}`;
       const dateStr = date.toISOString().split("T")[0];
 
       const apiSlot = slotsFromApi.find(
-        (s) =>
-          s.date === dateStr &&
-          s.startTime === startTime &&
-          s.endTime === endTime
+        (s) => s.date === dateStr && s.startTime === startTime && s.endTime === endTime
       );
       const status = apiSlot ? apiSlot.status : undefined;
 
@@ -135,11 +119,7 @@ export default function TimeSlotCalendar() {
     return slots;
   };
 
-  const handleSlotClick = (slot: {
-    startTime: string;
-    endTime: string;
-    status?: number;
-  }) => {
+  const handleSlotClick = (slot: { startTime: string; endTime: string; status?: number }) => {
     if (!selectedDay) {
       console.log(selectedDay);
       return;
@@ -152,18 +132,13 @@ export default function TimeSlotCalendar() {
     }
 
     if (!isTimeValidForScheduling(dateStr, slot.startTime)) {
-      alert(
-        "Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!"
-      );
+      alert("Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!");
       return;
     }
 
     // Find the corresponding slot from API to get its ID
     const apiSlot = slotsFromApi.find(
-      (s) =>
-        s.date === dateStr &&
-        s.startTime === slot.startTime &&
-        s.endTime === slot.endTime
+      (s) => s.date === dateStr && s.startTime === slot.startTime && s.endTime === slot.endTime
     );
 
     const slotToBook = {
@@ -178,12 +153,7 @@ export default function TimeSlotCalendar() {
   };
 
   // Xử lý khi nhấp vào slot để đặt lịch => bấm vô hiện ra popup chọn specialization và thông tin lịch + confirm đặt lịch
-  const openConfirmPopup = (slot: {
-    startTime: string;
-    endTime: string;
-    date: string;
-    status: number | undefined;
-  }) => {
+  const openConfirmPopup = (slot: { startTime: string; endTime: string; date: string; status: number | undefined }) => {
     // Don't open popup if slot is already booked
     if (slot.status != undefined && slot.status > 0) {
       return;
@@ -194,10 +164,7 @@ export default function TimeSlotCalendar() {
   };
 
   // Trong component TimeSlotCalendar
-  const handleConfirmAppointment = async (data: {
-    slot: TimeSlotToApi | undefined;
-    specializationId: number;
-  }) => {
+  const handleConfirmAppointment = async (data: { slot: TimeSlotToApi | undefined; specializationId: number }) => {
     if (!data.slot) {
       alert("Lỗi: Không có khung giờ nào được chọn");
       return;
