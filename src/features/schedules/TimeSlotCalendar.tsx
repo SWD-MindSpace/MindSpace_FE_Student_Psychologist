@@ -88,10 +88,29 @@ export default function TimeSlotCalendar() {
     return slotTime >= minimumScheduleTime;
   };
 
-  // Tạo danh sách slot tĩnh từ 00:00 đến 23:30
+  // Tạo danh sách slot từ API và bổ sung các slots 30 phút chuẩn
   const generateSlots = (
     date: Date
   ): { startTime: string; endTime: string; status?: number }[] => {
+    const dateStr = date.toISOString().split("T")[0];
+
+    // First, gather all API-provided slots for this date
+    const apiSlots = slotsFromApi
+      .filter((s) => s.date === dateStr)
+      .map((slot) => ({
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        status: slot.status,
+        id: slot.id,
+      }));
+
+    // If there are API slots, return them directly
+    if (apiSlots.length > 0) {
+      // Sort by startTime for better display
+      return apiSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    }
+
+    // Otherwise, fallback to generating standard 30-minute slots
     const slots: { startTime: string; endTime: string; status?: number }[] = [];
     let currentHour = 0;
     let currentMinute = 0;
@@ -114,17 +133,8 @@ export default function TimeSlotCalendar() {
       const endTime = `${endHour.toString().padStart(2, "0")}:${endMinute
         .toString()
         .padStart(2, "0")}`;
-      const dateStr = date.toISOString().split("T")[0];
 
-      const apiSlot = slotsFromApi.find(
-        (s) =>
-          s.date === dateStr &&
-          s.startTime === startTime &&
-          s.endTime === endTime
-      );
-      const status = apiSlot ? apiSlot.status : undefined;
-
-      slots.push({ startTime, endTime, status });
+      slots.push({ startTime, endTime });
 
       currentMinute += 30;
       if (currentMinute >= 60) {
@@ -139,6 +149,7 @@ export default function TimeSlotCalendar() {
     startTime: string;
     endTime: string;
     status?: number;
+    id?: number;
   }) => {
     if (!selectedDay) {
       console.log(selectedDay);
@@ -158,16 +169,8 @@ export default function TimeSlotCalendar() {
       return;
     }
 
-    // Find the corresponding slot from API to get its ID
-    const apiSlot = slotsFromApi.find(
-      (s) =>
-        s.date === dateStr &&
-        s.startTime === slot.startTime &&
-        s.endTime === slot.endTime
-    );
-
     const slotToBook = {
-      id: apiSlot?.id, // Include the id from the API data
+      id: slot.id, // Use the id directly from the slot
       startTime: slot.startTime,
       endTime: slot.endTime,
       date: dateStr,
@@ -179,10 +182,11 @@ export default function TimeSlotCalendar() {
 
   // Xử lý khi nhấp vào slot để đặt lịch => bấm vô hiện ra popup chọn specialization và thông tin lịch + confirm đặt lịch
   const openConfirmPopup = (slot: {
+    id?: number;
     startTime: string;
     endTime: string;
     date: string;
-    status: number | undefined;
+    status?: number;
   }) => {
     // Don't open popup if slot is already booked
     if (slot.status != undefined && slot.status > 0) {
@@ -238,7 +242,7 @@ export default function TimeSlotCalendar() {
 
   // Hàm xác định class style cho slot dựa trên trạng thái
   const getSlotClassName = (
-    slot: { startTime: string; endTime: string; status?: number },
+    slot: { startTime: string; endTime: string; status?: number; id?: number },
     selectedDay: Date | null
   ) => {
     if (!selectedDay) return styles.slotItem;
