@@ -7,6 +7,11 @@ import { FaComments, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 
 export default function ChatPopup() {
+
+  // ================================
+  // == Variables
+  // ================================
+
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -15,15 +20,25 @@ export default function ChatPopup() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
 
+  // ================================
+  // == Use Effects
+  // ================================
+
+  // 
   useEffect(() => {
     // Get user role from localStorage
     const role = localStorage.getItem("userRole");
     setUserRole(role);
   }, []);
 
+  // Scrolling down the chat when new messages are added
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // ================================
+  // == Functions
+  // ================================
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -97,11 +112,10 @@ export default function ChatPopup() {
             {messages.map((msg, index) => (
               <div key={index} className={`flex flex-col ${msg.userName === "You" ? "items-end" : "items-start"}`}>
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 ${
-                    msg.userName === "You"
-                      ? "bg-black text-white hover:bg-gray-800"
-                      : "bg-white text-black border border-gray-200 hover:border-gray-400"
-                  }`}
+                  className={`max-w-[80%] rounded-lg p-3 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 ${msg.userName === "You"
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-white text-black border border-gray-200 hover:border-gray-400"
+                    }`}
                 >
                   <p className="text-sm font-semibold mb-1 transition-all duration-300 hover:scale-105">
                     {msg.userName}
@@ -109,11 +123,10 @@ export default function ChatPopup() {
                   <p className="text-sm transition-all duration-300 hover:text-opacity-90">{msg.message}</p>
                   {msg.timestamp && (
                     <p
-                      className={`text-xs mt-1 transition-all duration-300 ${
-                        msg.userName === "You"
-                          ? "text-gray-300 hover:text-gray-200"
-                          : "text-gray-500 hover:text-gray-600"
-                      }`}
+                      className={`text-xs mt-1 transition-all duration-300 ${msg.userName === "You"
+                        ? "text-gray-300 hover:text-gray-200"
+                        : "text-gray-500 hover:text-gray-600"
+                        }`}
                     >
                       {msg.timestamp.toLocaleTimeString()}
                     </p>

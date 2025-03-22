@@ -35,11 +35,11 @@ export default function page() {
 
 
                         For more details on my education and work experience please visit my Linked In profile.</p>
-                    <Image 
-                    src='https://img1.wsimg.com/isteam/ip/5bd7378e-737c-48de-a4a5-f2d20b800b4e/CF5CF503-56A6-4387-B9A3-F0D248A66705_1_105_c.jpeg/:/cr=t:9.68%25,l:9.68%25,w:80.65%25,h:80.65%25/rs=w:768,cg:true,m'
-                    alt="FERGUS"
-                    width={600}
-                    height={400}
+                    <Image
+                        src='https://img1.wsimg.com/isteam/ip/5bd7378e-737c-48de-a4a5-f2d20b800b4e/CF5CF503-56A6-4387-B9A3-F0D248A66705_1_105_c.jpeg/:/cr=t:9.68%25,l:9.68%25,w:80.65%25,h:80.65%25/rs=w:768,cg:true,m'
+                        alt="FERGUS"
+                        width={600}
+                        height={400}
                     />
                 </div>
             </div>

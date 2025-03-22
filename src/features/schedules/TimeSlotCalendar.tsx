@@ -4,11 +4,7 @@ import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./styles/TimeslotCalendar.module.css";
-import {
-  TimeSlotFromApi,
-  ScheduleResponse,
-  TimeSlotToApi,
-} from "./schemas/ScheduleSchemas";
+import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/ScheduleSchemas";
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 
 const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
@@ -62,9 +58,7 @@ export default function TimeSlotCalendar() {
       // Log the fetch request
       console.log(`Fetching data for date: ${startDateStr}`);
 
-      fetch(
-        `${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`
-      ) // Put 0 to the constants PsychologistScheduleStatus
+      fetch(`${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`) // Put 0 to the constants PsychologistScheduleStatus
         .then((response) => response.json())
         .then((data: ScheduleResponse) => {
           const allSlots = data.flatMap((item) => item.timeSlots);
@@ -76,10 +70,7 @@ export default function TimeSlotCalendar() {
   }, [selectedDay, psychologistId]);
 
   // Kiểm tra slot book lịch mới (ít nhất 15 phút sau hiện tại, GMT+7)
-  const isTimeValidForScheduling = (
-    dateStr: string,
-    startTime: string
-  ): boolean => {
+  const isTimeValidForScheduling = (dateStr: string, startTime: string): boolean => {
     const now = new Date();
     const minimumScheduleTime = new Date(now.getTime() + 15 * 60 * 1000);
     const [hours, minutes] = startTime.split(":").map(Number);
@@ -163,9 +154,7 @@ export default function TimeSlotCalendar() {
     }
 
     if (!isTimeValidForScheduling(dateStr, slot.startTime)) {
-      alert(
-        "Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!"
-      );
+      alert("Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!");
       return;
     }
 
@@ -198,10 +187,7 @@ export default function TimeSlotCalendar() {
   };
 
   // Trong component TimeSlotCalendar
-  const handleConfirmAppointment = async (data: {
-    slot: TimeSlotToApi | undefined;
-    specializationId: number;
-  }) => {
+  const handleConfirmAppointment = async (data: { slot: TimeSlotToApi | undefined; specializationId: number }) => {
     if (!data.slot) {
       alert("Lỗi: Không có khung giờ nào được chọn");
       return;
