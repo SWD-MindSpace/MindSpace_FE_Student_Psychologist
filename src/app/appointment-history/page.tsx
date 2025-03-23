@@ -61,10 +61,44 @@ export default function AppointmentHistory() {
     pageSize: 5,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [psychologists, setPsychologists] = useState<string[]>([]);
+  const [loadingPsychologists, setLoadingPsychologists] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
   }, [activeFilters]);
+
+  useEffect(() => {
+    fetchPsychologists();
+  }, []);
+
+  const fetchPsychologists = async () => {
+    setLoadingPsychologists(true);
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await fetch(
+        "https://localhost:7096/api/v1/identities/accounts/psychologists",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken || ""}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch psychologists");
+      }
+
+      const data = await response.json();
+      setPsychologists(data);
+    } catch (err) {
+      console.error("Error fetching psychologists:", err);
+      toast.error("Failed to load psychologists");
+    } finally {
+      setLoadingPsychologists(false);
+    }
+  };
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -92,10 +126,7 @@ export default function AppointmentHistory() {
         queryParams.append("sort", activeFilters.sort);
       }
 
-      if (
-        activeFilters.psychologistName &&
-        activeFilters.psychologistName !== "All"
-      ) {
+      if (activeFilters.psychologistName) {
         queryParams.append("psychologistName", activeFilters.psychologistName);
       }
 
@@ -165,6 +196,7 @@ export default function AppointmentHistory() {
       sort: "dateDesc",
       pageIndex: 1,
       pageSize: 5,
+      psychologistName: undefined,
     };
     setFilters(defaultFilters);
     setActiveFilters(defaultFilters);
@@ -273,6 +305,28 @@ export default function AppointmentHistory() {
                       Date (Oldest First)
                     </SelectItem>
                   </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Psychologist
+                  </label>
+                  <select
+                    name="psychologistName"
+                    value={filters.psychologistName || ""}
+                    onChange={(e) => {
+                      handleFilterChange("psychologistName", e.target.value);
+                    }}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
+                    disabled={loadingPsychologists}
+                  >
+                    <option value="">All Psychologists</option>
+                    {psychologists.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
