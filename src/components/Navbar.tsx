@@ -66,7 +66,7 @@ export default function TopNav() {
                             <Link href="#">Cuộc hẹn đang đợi</Link>
                         </DropdownItem>
                         <DropdownItem key="appointment-history">
-                            <Link href="#">Lịch sử cuộc hẹn</Link>
+                            <Link href="/appointment-history">Lịch sử cuộc hẹn</Link>
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
