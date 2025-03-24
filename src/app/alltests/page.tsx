@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, CardHeader, Button, Spinner, Divider } from "@heroui/react";
+import { Card, CardBody, CardHeader, Button, Spinner, Divider, CardFooter, Image } from "@heroui/react";
 import { Toaster, toast } from 'react-hot-toast';
+import MotionHeading from '@/components/MotionHeading';
 
 type Test = {
     id: number;
@@ -117,10 +118,25 @@ export default function AllTests() {
     return (
         <div className="min-h-screen p-6 bg-gray-100">
             <Toaster position="top-center" reverseOrder={false} />
-            <h1 className="text-4xl font-bold font-bevnpro text-center text-blue-700 mb-8">
-                Các bài kiểm tra
-            </h1>
-            <Divider className='mb-10 w-1/2 mx-auto' />
+            <MotionHeading className='flex justify-center mb-6'>
+                <Image
+                    src="https://res.cloudinary.com/ddewgbug1/image/upload/v1742236899/ktakxftbqjdcn59g8y1l.jpg"
+                    alt="hello"
+                    width={1400}
+                    height={550}
+                    shadow='md'
+                    isBlurred
+                />
+            </MotionHeading>
+            <div className='mt-16'>
+                <MotionHeading className='text-center mb-4'>
+                    Sự thay đổi có thể bắt đầu bằng một bước duy nhất
+                </MotionHeading>
+                <MotionHeading className='font-normal text-center text-xl font-noto-sans' delay={0.5}>
+                    Các bài kiểm tra sức khỏe tâm thần trực tuyến của chúng tôi có thể giúp bạn hiểu được cảm xúc của mình và có thể là bước đầu tiên để nhận được sự trợ giúp phù hợp.
+                </MotionHeading>
+            </div>
+            <Divider className='my-10 w-1/2 mx-auto' />
 
             {/* If user is a Student, show Psychological & Periodic separately */}
             {userRole === "Student" ? (
@@ -128,23 +144,26 @@ export default function AllTests() {
                     {/* Psychological Tests */}
                     {psychologicalTests.length > 0 && (
                         <>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Psychological Tests</h2>
-                            <div className="grid gap-6">
+                            <MotionHeading className='text-center mb-6'>
+                                Psychological Tests
+                            </MotionHeading>
+                            <div className="grid md:grid-cols-3 gap-6 font-noto-sans">
                                 {psychologicalTests.map((test) => (
-                                    <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
-                                        <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
-                                        <CardBody>
-                                            <p className="text-black text-lg">{test.testCode}</p>
+                                    <Card key={test.id} className="bg-white shadow-md hover:scale-105 transition-transform">
+                                        <CardHeader className="text-xl font-bold font-bevnpro bg-first-color h-[80px]">{test.title}</CardHeader>
+                                        <CardBody className='px-6'>
+                                            <p className="font-semibold text-2xl pb-2">{test.testCode}</p>
                                             <p className="text-gray-600 text-lg">{test.description}</p>
+                                        </CardBody>
+                                        <CardFooter className='px-6'>
                                             <Button
-                                                color="primary"
                                                 variant="shadow"
-                                                className="mt-3 w-fit p-5"
+                                                className="mt-3 w-fit p-5 bg-second-color"
                                                 onPress={() => handleStartTest(test.id)}
                                             >
                                                 Take Test
                                             </Button>
-                                        </CardBody>
+                                        </CardFooter>
                                     </Card>
                                 ))}
                             </div>
@@ -154,8 +173,10 @@ export default function AllTests() {
                     {/* Periodic Tests */}
                     {periodicTests.length > 0 && (
                         <>
-                            <Divider className="my-10" />
-                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Periodic Tests</h2>
+                            <Divider className="my-10 w-1/2 mx-auto" />
+                            <MotionHeading className='text-center mb-6'>
+                                Periodc Tests
+                            </MotionHeading>
                             <div className="grid gap-6">
                                 {periodicTests.map((test) => (
                                     <Card key={test.id} className="p-6 bg-yellow-50 shadow-md hover:shadow-lg transition duration-300">
@@ -185,22 +206,23 @@ export default function AllTests() {
                         No tests available.
                     </p>
                 ) : (
-                    <div className="grid gap-6">
+                    <div className="grid md:grid-cols-3 gap-6">
                         {displayedTests.map((test) => (
-                            <Card key={test.id} className="p-6 bg-white shadow-md hover:shadow-lg transition duration-300">
-                                <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
-                                <CardBody>
-                                    <p className="text-black text-lg">{test.testCode}</p>
+                            <Card key={test.id} className="bg-white shadow-md hover:shadow-lg transition duration-300">
+                                <CardHeader className="text-xl font-bevnpro font-bold bg-first-color h-[80px]">{test.title}</CardHeader>
+                                <CardBody className='px-6 font-noto-sans'>
+                                    <p className="text-2xl font-semibold">{test.testCode}</p>
                                     <p className="text-gray-600 text-lg">{test.description}</p>
-                                    <Button
-                                        color="primary"
-                                        variant="shadow"
-                                        className="mt-3 w-fit p-5"
-                                        onPress={() => handleStartTest(test.id)}
-                                    >
-                                        Take Test
-                                    </Button>
                                 </CardBody>
+                                <CardFooter className='px-6'>
+                                        <Button
+                                            variant="shadow"
+                                            className="mt-3 w-fit p-5 bg-second-color"
+                                            onPress={() => handleStartTest(test.id)}
+                                        >
+                                            Take Test
+                                        </Button>
+                                    </CardFooter>
                             </Card>
                         ))}
                     </div>

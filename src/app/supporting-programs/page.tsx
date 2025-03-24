@@ -52,7 +52,7 @@ export default function SupportingPrograms() {
       setLoading(true);
       const accessToken = localStorage.getItem("accessToken");
       const userId = localStorage.getItem("userId");
-
+  
       try {
         const programsResponse = await fetch(
           `https://localhost:7096/api/v1/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100`,
@@ -64,13 +64,15 @@ export default function SupportingPrograms() {
             },
           }
         );
-
+  
         if (!programsResponse.ok) {
           throw new Error("Failed to fetch programs");
         }
         const programsData = await programsResponse.json();
-        let availablePrograms = programsData.data;
-
+        
+        // Filter only active programs
+        let availablePrograms = programsData.data.filter((p: SupportingProgram) => p.isActive);
+  
         // If user is logged in, fetch registered programs and filter
         if (accessToken && userId) {
           const registeredResponse = await fetch(
@@ -83,7 +85,7 @@ export default function SupportingPrograms() {
               },
             }
           );
-
+  
           if (!registeredResponse.ok) {
             throw new Error("Failed to fetch registered programs");
           }
@@ -92,13 +94,12 @@ export default function SupportingPrograms() {
             (p: SupportingProgram) => p.id
           );
           setRegisteredProgramIds(registeredIds);
-
-          // Filter out registered programs
+  
           availablePrograms = availablePrograms.filter(
             (program: SupportingProgram) => !registeredIds.includes(program.id)
           );
         }
-
+  
         setAllPrograms(availablePrograms);
         setTotalPages(Math.ceil(availablePrograms.length / pageSize));
       } catch (error) {
@@ -107,7 +108,7 @@ export default function SupportingPrograms() {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
@@ -172,8 +173,8 @@ export default function SupportingPrograms() {
       ) : (
         <>
           {localStorage.getItem("accessToken") &&
-          allPrograms.length === 0 &&
-          registeredProgramIds.length > 0 ? (
+            allPrograms.length === 0 &&
+            registeredProgramIds.length > 0 ? (
             <p className="text-center text-xl text-gray-600">
               You have already registered for all available programs.
             </p>
@@ -203,8 +204,7 @@ export default function SupportingPrograms() {
                             <FaMapMarkerAlt className="mr-2" /> {program.street}
                           </p>
                           <p className="text-gray-600 text-lg flex items-center">
-                            <FaCalendarAlt className="mr-2" />{" "}
-                            {new Date(program.startDateAt).toLocaleDateString()}
+                            <FaCalendarAlt className="mr-2" /> {new Date(program.startDateAt.split("/").reverse().join("-")).toLocaleDateString()}
                           </p>
                           <p className="font-semibold flex items-center">
                             {program.isActive ? (

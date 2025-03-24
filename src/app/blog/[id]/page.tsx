@@ -115,7 +115,10 @@ export default function BlogDetailPage() {
       </div>
 
       <div className="text-2xl text-black mb-10 font-noto-sans leading-relaxed">
-        <div className='font-bevnpro font-bold text-secondary-blue text-3xl py-4'>Introduction</div>
+        {/* <div className='font-bevnpro font-bold text-secondary-blue text-3xl py-4'>Introduction</div> */}
+        <MotionHeading className='text-secondary-blue text-3xl py-4'>
+          Introduction
+        </MotionHeading>
         <div>{blog.introduction} </div>
       </div>
 
@@ -123,7 +126,9 @@ export default function BlogDetailPage() {
 
       {blog.sections.map((section, index) => (
         <div key={index} className="mt-8">
-          <h2 className="text-3xl font-semibold mb-2 font-bevnpro text-secondary-blue">{section.heading}</h2>
+          <MotionHeading className='text-3xl font-semibold mb-2 text-secondary-blue'>
+            {section.heading}
+          </MotionHeading>
           <div dangerouslySetInnerHTML={{ __html: section.htmlContent }} className="text-lg text-gray-800 leading-relaxed font-noto-sans"></div>
         </div>
       ))}

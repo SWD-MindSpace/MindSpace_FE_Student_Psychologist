@@ -25,7 +25,6 @@ export default function AboutPage() {
                                 shadow="md"
                                 isBlurred
                                 isZoomed
-                                fallbackSrc="/path-to-fallback-image.jpg"
                             />
                         </div>
 
@@ -64,7 +63,6 @@ export default function AboutPage() {
                                     src={member.image}
                                     alt={member.name}
                                     className="w-24 h-24 rounded-full object-cover mb-3"
-                                    fallbackSrc="/team/default.jpg" // Fallback image in case the main image fails to load
                                 />
                                 <h3 className="font-semibold text-lg">{member.name}</h3>
                                 <p className="text-gray-600">{member.role}</p>

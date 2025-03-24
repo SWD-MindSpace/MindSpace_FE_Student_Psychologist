@@ -20,6 +20,7 @@
     line-height: calc(1em + 0.5rem);
     -webkit-font-smoothing: antialiased;
     color: var(--black);
+    overflow-x: hidden;
   }
   img, picture, video, canvas, svg {
     display: block;
@@ -52,4 +53,9 @@
     --black: #272727;
     --txt-gray: #727272;
     --bg-gray: #E4E7EF;
+    --first-color: #5AA7A7;
+    --second-color: #96D7C6;
+    --third-color: #BAC94A;
+    --fourth-color: #E2D368;
+    --fifth-color: #6C8CBF;
 }

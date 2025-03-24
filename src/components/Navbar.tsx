@@ -29,12 +29,12 @@ export default function TopNav() {
     }, []);
 
     return (
-        <Navbar maxWidth="2xl" className="border-b border-gray-300 h-24 px-4 shadow-md md:px-4 font-noto-sans">
+        <Navbar shouldHideOnScroll maxWidth="2xl" className="bg-fifth-color h-24 px-4 shadow-md md:px-4 font-noto-sans">
             <div className="flex justify-between items-center w-full">
                 <NavbarBrand className="gap-2">
                     <motion.div
                         whileHover={{
-                            y: [-4, 4, -4, 0], // Moves up and down for a bouncing effect
+                            y: [-4, 4, -4, 0],
                             transition: { duration: 1, repeat: Infinity, repeatType: "reverse" },
                         }}
                     >
@@ -78,7 +78,7 @@ export default function TopNav() {
                 {user && (
                     <NavbarItem>
                         <Link href="/video-chat" className='flex items-center gap-2 hover:text-secondary-blue transition-all'>
-                            <FiVideo size={18} />
+                            <FiVideo size={40} />
                             Video Chat
                         </Link>
                     </NavbarItem>
@@ -130,7 +130,7 @@ export default function TopNav() {
                     <Link href="/about-us" className="py-2 text-center">Về chúng tôi</Link>
                     {user && (
                         <Link href="/video-chat" className="py-2 text-center flex items-center justify-center gap-2">
-                            <FiVideo size={18} />
+                            <FiVideo size={40} />
                             Video Chat
                         </Link>
                     )}

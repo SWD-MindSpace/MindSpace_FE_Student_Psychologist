@@ -62,7 +62,7 @@ export default function Profile() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-100 to-blue-400">
-      <Card className="max-w-md w-full bg-white backdrop-blur-md shadow-2xl rounded-2xl p-8">
+      <Card className="max-w-4xl w-full bg-white backdrop-blur-md shadow-2xl rounded-2xl p-8">
         <CardHeader className="text-2xl font-semibold font-bevnpro text-center text-gray-900">Profile</CardHeader>
         <CardBody className="flex flex-col items-center gap-6 font-bevnpro">
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
