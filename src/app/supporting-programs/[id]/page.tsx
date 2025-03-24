@@ -79,7 +79,7 @@ export default function ProgramDetail() {
 
                             <div className="mt-2 flex items-center gap-2">
                                 <FaCalendarAlt className="text-gray-500" />
-                                <span className="text-gray-600">{new Date(program.startDateAt).toLocaleDateString()}</span>
+                                <span className="text-gray-600">{new Date(program.startDateAt.split("/").reverse().join("-")).toLocaleDateString()}</span>
                             </div>
 
                             <p className="mt-4 text-lg font-semibold">Maximum Participants: {program.maxQuantity}</p>

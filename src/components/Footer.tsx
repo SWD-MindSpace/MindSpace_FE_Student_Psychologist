@@ -12,11 +12,6 @@ export default function Footer() {
             <h2 className="text-2xl font-bold font-bevnpro">MindSpace</h2>
             <p className="mt-2 text-sm">Nền tảng chăm sóc sức khỏe tinh thần đáng tin cậy.</p>
             <p className="mt-2 text-sm">Trang web tinh thần đáng tin cậy được chứng nhận.</p>
-            <p className="mt-2 text-lg font-noto-sans">
-              <Link href="/login" className="hover:underline">
-                Đăng nhập để được trợ giúp.
-              </Link>
-            </p>
           </div>
 
           <div>
@@ -50,10 +45,10 @@ export default function Footer() {
             <h2 className="text-xl font-bevnpro">Các bài test</h2>
             <ul className="mt-2 space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:underline">Psychology test</Link>
+                <Link href="/alltests" className="hover:underline">Psychology test</Link>
               </li>
               <li>
-                <Link href="#" className="hover:underline">Periodic test</Link>
+                <Link href="/alltests" className="hover:underline">Periodic test</Link>
               </li>
             </ul>
           </div>

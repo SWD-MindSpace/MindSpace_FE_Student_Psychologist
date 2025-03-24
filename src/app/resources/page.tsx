@@ -84,10 +84,10 @@ export default function ResourcesPage() {
           backgroundImage: `url('https://res.cloudinary.com/ddewgbug1/image/upload/v1741981097/olbcqunkuzkziwnajtqg.webp')`,
         }}
       >
-        <MotionHeading className="text-5xl">
+        <MotionHeading className="text-5xl text-black text-center">
           MindSpace
         </MotionHeading>
-        <MotionHeading className="text-xl font-noto-sans mt-5" delay={0.5}>
+        <MotionHeading className="text-xl text-black font-noto-sans mt-5 text-center" delay={0.5}>
           Khám phá các blog và bài viết mới nhất về sức khỏe tâm thần.
         </MotionHeading>
       </div>

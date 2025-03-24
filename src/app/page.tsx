@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FaBrain, FaHeart, FaHandsHelping, FaCheckCircle } from "react-icons/fa";
-import { Card, CardBody, CardHeader, Image, Button, Divider } from "@heroui/react";
+import { Card, CardBody, CardHeader, Image, Button, Divider, ScrollShadow } from "@heroui/react";
 import { GrUserExpert } from "react-icons/gr";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { MdModelTraining } from "react-icons/md";
@@ -67,8 +67,8 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <section className="relative bg-secondary-blue text-white py-28 text-center font-noto-sans overflow-hidden shadow-sm shadow-black">
+    <div className="min-h-screen bg-gray-50">
+      <section className="relative bg-secondary-blue text-white py-28 text-center font-noto-sans shadow-sm shadow-black">
         {/* Background Video */}
         <video className="absolute top-0 left-0 w-full h-full object-cover" autoPlay loop muted playsInline>
           <source
@@ -84,7 +84,7 @@ export default function Home() {
           <MotionHeading className="text-xl font-noto-sans mt-4" delay={0.5}>
             Hành trình đến với sức khỏe tinh thần của bạn bắt đầu từ đây.
           </MotionHeading>
-          <Link href="/appointments">
+          <Link href="/psychologists">
             <Button className="mt-6 px-8 py-3 text-lg font-semibold shadow-lg transition-transform hover:scale-105">
               Đặt một cuộc hẹn
             </Button>
@@ -128,17 +128,17 @@ export default function Home() {
             alt="Mental Health Support"
             width={600}
             height={400}
-            className="rounded-lg shadow-lg"
+            className="shadow-lg"
           />
         </div>
 
         <div className="w-full md:w-1/2">
-          <MotionHeading className="text-secondary-blue">Scale & Expand Mental Health Services</MotionHeading>
-          <p className="text-gray-600 mt-4">
-            MindSpace eliminates wait times for mental health support and reduces overwhelming caseloads for counseling
-            center staff.
-          </p>
-          <ul className="mt-6 space-y-3">
+          <MotionHeading className="text-secondary-blue text-5xl" direction="right">Mở rộng & Nâng cao</MotionHeading>
+          <MotionHeading className="text-secondary-blue font-normal font-noto-sans mt-2" direction="right" delay={0.5}>Dịch vụ Sức khỏe Tâm thần</MotionHeading>
+          <MotionHeading className="mt-4 font-normal font-noto-sans text-lg" direction="right" delay={1}>
+            MindSpace loại bỏ thời gian chờ đợi để được hỗ trợ sức khỏe tâm thần và giảm bớt khối lượng công việc quá tải cho nhân viên trung tâm tư vấn.
+          </MotionHeading>
+          <ul className="grid md:grid-cols-2 mt-6">
             {[
               "24/7 Support Counseling",
               "Same-Day Appointments",
@@ -147,8 +147,8 @@ export default function Home() {
               "Evidence-Based Articles & Videos",
               "Teletherapy (No Insurance Needed)",
             ].map((item, index) => (
-              <li key={index} className="flex items-center text-lg">
-                <FaCheckCircle className="text-green-600 mr-2" /> {item}
+              <li key={index} className="flex items-center text-lg py-3">
+                <FaCheckCircle className="text-third-color mr-2" /> {item}
               </li>
             ))}
           </ul>
@@ -157,10 +157,10 @@ export default function Home() {
 
       <section className="container mx-auto my-36 px-6 font-noto-sans">
         <MotionHeading className="text-center text-secondary-blue mb-6">Meet Our Expert Psychologists</MotionHeading>
-        <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
+        <MotionHeading className="text-center text-gray-600 mx-auto mb-12 text-lg font-noto-sans" delay={0.5}>
           Our team of licensed psychologists is dedicated to providing compassionate care, offering evidence-based
           therapies tailored to your needs.
-        </p>
+        </MotionHeading>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {psychologists.map((psychologist) => (
@@ -237,14 +237,14 @@ export default function Home() {
 
       <Divider className="w-1/2 mx-auto mb-10" />
 
-      <section className="container mx-auto mb-10 px-6 text-center">
+      <section className="container mx-auto py-6 px-6 text-center">
         <h2 className="text-4xl font-bold text-secondary-blue">Why Students Love MindSpace</h2>
         <p className="text-gray-600 mt-4 text-lg">
           Hear from students who have benefited from our support and services.
         </p>
 
-        <div className="mt-10 overflow-x-auto">
-          <div className="flex space-x-6 w-max">
+        <ScrollShadow hideScrollBar className="mt-10">
+          <div className="flex space-x-6">
             {[
               {
                 name: "Sophia Johnson",
@@ -308,7 +308,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </ScrollShadow>
       </section>
     </div>
   );
