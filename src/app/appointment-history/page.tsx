@@ -18,32 +18,9 @@ import { FaUser } from "react-icons/fa";
 import MotionHeading from "@/components/MotionHeading";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-
-// Define the Appointment interface directly here since we have the exact shape already
-interface Appointment {
-  date: string;
-  startTime: string;
-  endTime: string;
-  psychologistName: string;
-  isUpcoming: boolean;
-  meetUrl: string | null;
-}
-
-interface AppointmentFilter {
-  psychologistName?: string;
-  startDate?: string;
-  endDate?: string;
-  sort?: "dateAsc" | "dateDesc";
-  pageIndex?: number;
-  pageSize?: number;
-}
-
-interface PaginatedResponse<T> {
-  pageIndex: number;
-  pageSize: number;
-  count: number;
-  data: T[];
-}
+import { Appointment } from "@/types/appointment";
+import { AppointmentFilter } from "@/types/filters";
+import { PaginatedResponse } from "@/types/paginatedResponse";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -92,9 +69,12 @@ export default function AppointmentHistory() {
 
       const data = await response.json();
       setPsychologists(data);
+      setLoadingPsychologists(false);
     } catch (err) {
       console.error("Error fetching psychologists:", err);
+      setError("Failed to load psychologists. Please try again later.");
       toast.error("Failed to load psychologists");
+      setPsychologists([]);
     } finally {
       setLoadingPsychologists(false);
     }
@@ -132,7 +112,9 @@ export default function AppointmentHistory() {
 
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/appointments/user?${queryParams.toString()}`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/appointments/user?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -309,7 +291,7 @@ export default function AppointmentHistory() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Psychologist
+                    Tên chuyên gia tâm lí
                   </label>
                   <select
                     name="psychologistName"
@@ -320,7 +302,7 @@ export default function AppointmentHistory() {
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
                     disabled={loadingPsychologists}
                   >
-                    <option value="">All Psychologists</option>
+                    <option value="">Tất cả chuyên gia tâm lí</option>
                     {psychologists.map((name) => (
                       <option key={name} value={name}>
                         {name}
@@ -358,10 +340,11 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
-                    ? "border-l-4 border-green-500"
-                    : "border-l-4 border-gray-300"
-                    }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
+                    appointment.isUpcoming
+                      ? "border-l-4 border-green-500"
+                      : "border-l-4 border-gray-300"
+                  }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">
