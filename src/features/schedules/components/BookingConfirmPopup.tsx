@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./styles/ConfirmAppointmentPopup.module.css";
 import { TimeSlotToApi } from "../schemas/ScheduleSchemas";
 
@@ -7,7 +7,15 @@ interface ConfirmAppointmentPopupProps {
   isOpen: boolean;
   onClose: () => void;
   selectedSlot: TimeSlotToApi | undefined;
-  onConfirm: (data: { slot: TimeSlotToApi | undefined; specializationId: number }) => void;
+  onConfirm: (data: {
+    slot: TimeSlotToApi | undefined;
+    specializationId: number;
+  }) => void;
+}
+
+interface Specialization {
+  id: number;
+  name: string;
 }
 
 // Sử dụng interface trong component
@@ -18,16 +26,33 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
   selectedSlot,
 }) => {
   const [specializationId, setSpecializationId] = useState(0);
+  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // get from api
-  // var results = fetch(`${process.env.NEXT_PUBLIC_API_URL}/specializations`);
-  const specializations = [
-    { id: "1", name: "General Medicine" },
-    { id: "2", name: "Cardiology" },
-    { id: "3", name: "Dermatology" },
-    { id: "4", name: "Neurology" },
-    { id: "5", name: "Pediatrics" },
-  ];
+  // Fetch specializations from API
+  useEffect(() => {
+    const fetchSpecializations = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/specializations`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch specializations");
+        }
+        const result = await response.json();
+        setSpecializations(result.data || []);
+      } catch (error) {
+        console.error("Error fetching specializations:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchSpecializations();
+    }
+  }, [isOpen]);
 
   const handleConfirm = () => {
     if (!specializationId) {
@@ -63,6 +88,7 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
             id="specialization"
             value={specializationId}
             onChange={(e) => setSpecializationId(parseInt(e.target.value))}
+            disabled={isLoading}
           >
             <option value="">-- Chọn 1 lĩnh vực --</option>
             {specializations.map((spec) => (
@@ -71,6 +97,7 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
               </option>
             ))}
           </select>
+          {isLoading && <span className={styles.loadingText}>Đang tải...</span>}
         </div>
 
         <div className={styles.popupButtons}>

@@ -20,7 +20,7 @@ class WebRTCService {
   private localStream: MediaStream | null = null;
   private remoteStream: MediaStream | null = null;
   private connection: signalR.HubConnection = new signalR.HubConnectionBuilder()
-    .withUrl(`${process.env.NEXT_PUBLIC_API_URL}/hub/webrtc`)
+    .withUrl(`${process.env.NEXT_PUBLIC_URL}/hub/webrtc`)
     .withAutomaticReconnect()
     .build();
   private onRemoteStreamCallback:
@@ -102,8 +102,9 @@ class WebRTCService {
           this.onRemoteStreamCallback(null);
         }
 
-        console.log("Leaving room:", this.roomId);
-        this.connection.invoke("LeaveRoom", this.roomId);
+        // Don't try to invoke methods when the connection is closed
+        console.log("Connection closed, room:", this.roomId);
+        this.roomId = null;
       });
 
       // Start the SignalR connection
@@ -138,8 +139,14 @@ class WebRTCService {
 
   public async leaveRoom() {
     try {
-      await this.connection.invoke("LeaveRoom", this.roomId);
-      console.log("Left room:", this.roomId);
+      if (this.connection.state === "Connected") {
+        await this.connection.invoke("LeaveRoom", this.roomId);
+        console.log("Left room:", this.roomId);
+      } else {
+        console.log(
+          `Cannot leave room: connection state is ${this.connection.state}`
+        );
+      }
       this.roomId = null;
     } catch (error) {
       console.error("Error leaving room:", error);
@@ -148,11 +155,19 @@ class WebRTCService {
 
   public async joinRoom(roomId: string) {
     try {
-      await this.connection.invoke("JoinRoom", roomId);
-      this.roomId = roomId;
-      console.log("Joined room:", roomId);
+      if (this.connection.state === "Connected") {
+        await this.connection.invoke("JoinRoom", roomId);
+        this.roomId = roomId;
+        console.log("Joined room:", roomId);
+      } else {
+        console.error(
+          `Cannot join room: connection state is ${this.connection.state}`
+        );
+        throw new Error(`Cannot join room: connection is not connected`);
+      }
     } catch (error) {
       console.error("Error joining room:", error);
+      throw error;
     }
   }
 
@@ -181,6 +196,25 @@ class WebRTCService {
       return;
     }
 
+    // Check if we're in a state where we can create an offer
+    if (peerConnection.signalingState !== "stable") {
+      console.log(
+        `Cannot create offer: signaling state is ${peerConnection.signalingState}, waiting...`
+      );
+      // Wait for the signaling state to stabilize before creating offer
+      await new Promise<void>((resolve) => {
+        const checkState = () => {
+          if (!peerConnection || peerConnection.signalingState === "stable") {
+            resolve();
+          } else {
+            setTimeout(checkState, 500);
+          }
+        };
+        checkState();
+      });
+    }
+
+    // If we already have a local offer, don't create another one
     if (
       peerConnection.localDescription &&
       peerConnection.localDescription.type === "offer"
@@ -192,6 +226,19 @@ class WebRTCService {
     }
 
     try {
+      // Create offer with explicit transceivers to maintain consistent m-line order
+      // First, check if we need to create transceivers
+      const transceivers = peerConnection.getTransceivers();
+      if (transceivers.length === 0 && this.localStream) {
+        // Create transceivers in consistent order - video first, then audio
+        if (this.localStream.getVideoTracks().length > 0) {
+          peerConnection.addTransceiver("video", { direction: "sendrecv" });
+        }
+        if (this.localStream.getAudioTracks().length > 0) {
+          peerConnection.addTransceiver("audio", { direction: "sendrecv" });
+        }
+      }
+
       // Create offer with consistent m-line order
       const offer = await peerConnection.createOffer({
         offerToReceiveAudio: true,
@@ -214,29 +261,33 @@ class WebRTCService {
           JSON.stringify(peerConnection.localDescription)
         );
 
-        await this.connection.invoke(
-          "SendOffer",
-          this.roomId,
-          JSON.stringify(peerConnection.localDescription)
-        );
-
-        console.log("Offer sent to user:", connectionId);
+        if (this.connection.state === "Connected") {
+          await this.connection.invoke(
+            "SendOffer",
+            this.roomId,
+            JSON.stringify(peerConnection.localDescription)
+          );
+          console.log("Offer sent to user:", connectionId);
+        } else {
+          console.error(
+            `Cannot send offer: connection state is ${this.connection.state}`
+          );
+        }
       } else {
         console.warn(`No local description found for ${connectionId}`);
       }
     } catch (error) {
       console.error("Error creating or sending offer:", error);
 
-      // If there was an error with the order of m-lines, try recreating the connection
+      // If there was an error with the order of m-lines, recreate the peer connection
       if (
         error instanceof Error &&
-        error.message.includes(
+        (error.message.includes(
           "The order of m-lines in subsequent offer doesn't match"
-        )
+        ) ||
+          error.message.includes("Failed to set local offer sdp"))
       ) {
-        console.log(
-          "M-line order mismatch detected. Recreating peer connection..."
-        );
+        console.log("SDP error detected. Recreating peer connection...");
 
         // Close the existing connection
         peerConnection.close();
@@ -265,13 +316,40 @@ class WebRTCService {
         if (peerConnection) {
           try {
             const parsedAnswer = JSON.parse(answer);
+
+            // Check if we're in the right state to receive an answer
+            if (peerConnection.signalingState !== "have-local-offer") {
+              console.warn(
+                `Cannot set remote answer: signaling state is ${peerConnection.signalingState}, expected 'have-local-offer'`
+              );
+              return;
+            }
+
             await peerConnection.setRemoteDescription(
               new RTCSessionDescription(parsedAnswer)
             );
 
-            console.log("Answer received from user:", fromConnectionId);
+            console.log("Answer processed from user:", fromConnectionId);
           } catch (error) {
-            console.error("Error parsing answer:", error);
+            console.error("Error processing answer:", error);
+
+            // If we have an invalid state error, the negotiation may be out of sync
+            if (
+              error instanceof Error &&
+              (error.message.includes("Called in wrong state") ||
+                error.message.includes("Failed to set remote answer sdp"))
+            ) {
+              console.log(
+                "Invalid state for answer, restarting negotiation..."
+              );
+
+              // Restart the negotiation process
+              if (this.connectionId && this.connectionId > fromConnectionId) {
+                setTimeout(() => {
+                  this.sendOfferToUser(fromConnectionId);
+                }, 1000);
+              }
+            }
           }
         } else {
           console.warn(`No peer connection found for ${fromConnectionId}`);
@@ -279,6 +357,7 @@ class WebRTCService {
       }
     );
   }
+
   private handleReceiveOffer() {
     this.connection.on(
       "ReceiveOffer",
@@ -305,6 +384,40 @@ class WebRTCService {
             peerConnection = this.peerConnections.get(fromConnectionId);
           }
 
+          // Handle different signaling states properly
+          if (peerConnection!.signalingState !== "stable") {
+            console.log(
+              `Peer connection not in stable state (${
+                peerConnection!.signalingState
+              }), rolling back...`
+            );
+
+            // If we have a pending local offer, roll it back
+            if (peerConnection!.signalingState === "have-local-offer") {
+              await peerConnection!.setLocalDescription({ type: "rollback" });
+              console.log("Rolled back local description");
+            }
+
+            // Wait for rollback to complete
+            await new Promise<void>((resolve) => {
+              const checkState = () => {
+                if (
+                  !peerConnection ||
+                  peerConnection.signalingState === "stable"
+                ) {
+                  resolve();
+                } else {
+                  setTimeout(checkState, 100);
+                }
+              };
+              checkState();
+            });
+
+            console.log(
+              "Signaling state is now stable, continuing with offer processing"
+            );
+          }
+
           // Set the remote description
           await peerConnection!.setRemoteDescription(
             new RTCSessionDescription(parsedOffer)
@@ -315,34 +428,102 @@ class WebRTCService {
           const answer = await peerConnection!.createAnswer();
           console.log(`Created answer for ${fromConnectionId}:`, answer);
 
-          await peerConnection!.setLocalDescription(answer);
-          console.log(`Local description (answer) set for ${fromConnectionId}`);
+          // Check signaling state before setting local description
+          if (peerConnection!.signalingState === "have-remote-offer") {
+            await peerConnection!.setLocalDescription(answer);
+            console.log(
+              `Local description (answer) set for ${fromConnectionId}`
+            );
 
-          // Send the answer
-          await this.connection.invoke(
-            "SendAnswer",
-            fromConnectionId,
-            JSON.stringify(answer)
-          );
-          console.log(`Answer sent to ${fromConnectionId}`);
+            // Send the answer
+            if (this.connection.state === "Connected") {
+              await this.connection.invoke(
+                "SendAnswer",
+                fromConnectionId,
+                JSON.stringify(answer)
+              );
+              console.log(`Answer sent to ${fromConnectionId}`);
+            } else {
+              console.error(
+                `Cannot send answer: connection state is ${this.connection.state}`
+              );
+            }
+          } else {
+            console.warn(
+              `Cannot set local description: Signaling state is ${
+                peerConnection!.signalingState
+              }, expected 'have-remote-offer'`
+            );
+          }
         } catch (error) {
           console.error("Error handling offer:", error);
 
-          // If we have an m-line order mismatch, recreate the connection
+          // If we have an SDP-related error, recreate the connection
           if (
             error instanceof Error &&
-            error.message.includes(
+            (error.message.includes(
               "The order of m-lines in subsequent offer doesn't match"
-            )
+            ) ||
+              error.message.includes("Called in wrong state") ||
+              error.message.includes("Failed to set remote offer sdp"))
           ) {
-            console.log(
-              "M-line order mismatch detected. Recreating peer connection..."
-            );
+            console.log("SDP error detected. Recreating peer connection...");
+
+            // Get the existing connection
+            const peerConnection = this.peerConnections.get(fromConnectionId);
+            if (peerConnection) {
+              peerConnection.close();
+              this.peerConnections.delete(fromConnectionId);
+            }
+
+            // Create a new connection
             this.createPeerConnection(fromConnectionId);
+
+            // Try processing the offer again after a short delay
+            setTimeout(() => {
+              if (this.connection.state === "Connected") {
+                this.handleProcessOffer(offer, fromConnectionId);
+              }
+            }, 1000);
           }
         }
       }
     );
+  }
+
+  // Added this method to handle reprocessing offers after connection reset
+  private async handleProcessOffer(offer: string, fromConnectionId: string) {
+    try {
+      console.log(`Reprocessing offer from ${fromConnectionId}`);
+
+      const parsedOffer = JSON.parse(offer);
+      const peerConnection = this.peerConnections.get(fromConnectionId);
+
+      if (!peerConnection) {
+        console.warn(`No peer connection found for ${fromConnectionId}`);
+        return;
+      }
+
+      // Set the remote description
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(parsedOffer)
+      );
+
+      // Create and set local answer
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+
+      // Send the answer
+      if (this.connection.state === "Connected") {
+        await this.connection.invoke(
+          "SendAnswer",
+          fromConnectionId,
+          JSON.stringify(answer)
+        );
+      }
+    } catch (error) {
+      console.error("Error reprocessing offer:", error);
+    }
   }
 
   private handleReceiveIceCandidate() {
@@ -422,17 +603,21 @@ class WebRTCService {
         const videoTracks = this.localStream.getVideoTracks();
         const audioTracks = this.localStream.getAudioTracks();
 
-        // Add video tracks first
-        videoTracks.forEach((track) => {
-          console.log(`Adding video track: ${track.id} to peer connection`);
-          peerConnection.addTrack(track, this.localStream!);
-        });
+        // Set a consistent order: always add all video tracks, then all audio tracks
+        // This helps prevent m-line order mismatches
+        if (videoTracks.length > 0) {
+          videoTracks.forEach((track) => {
+            console.log(`Adding video track: ${track.id} to peer connection`);
+            peerConnection.addTrack(track, this.localStream!);
+          });
+        }
 
-        // Then add audio tracks
-        audioTracks.forEach((track) => {
-          console.log(`Adding audio track: ${track.id} to peer connection`);
-          peerConnection.addTrack(track, this.localStream!);
-        });
+        if (audioTracks.length > 0) {
+          audioTracks.forEach((track) => {
+            console.log(`Adding audio track: ${track.id} to peer connection`);
+            peerConnection.addTrack(track, this.localStream!);
+          });
+        }
       } catch (error) {
         console.error(
           "Error adding local stream tracks to peer connection:",
@@ -476,11 +661,17 @@ class WebRTCService {
             `ICE candidate for ${connectionId}:`,
             event.candidate.candidate
           );
-          this.connection.invoke(
-            "SendIceCandidate",
-            connectionId,
-            JSON.stringify(event.candidate)
-          );
+          if (this.connection.state === "Connected") {
+            this.connection.invoke(
+              "SendIceCandidate",
+              connectionId,
+              JSON.stringify(event.candidate)
+            );
+          } else {
+            console.warn(
+              `Cannot send ICE candidate: connection state is ${this.connection.state}`
+            );
+          }
         } catch (error) {
           console.error("Error sending ice candidate:", error);
         }

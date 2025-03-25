@@ -64,7 +64,7 @@ export default function TimeSlotCalendar() {
       // Log the fetch request
       console.log(`Fetching data for date: ${startDateStr}`);
 
-      fetch(`${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=0`) // Put 0 to the constants PsychologistScheduleStatus
+      fetch(`${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=free`) // Put 0 to the constants PsychologistScheduleStatus
         .then((response) => response.json())
         .then((data: ScheduleResponse) => {
           const allSlots = data.flatMap((item) => item.timeSlots);
@@ -82,7 +82,8 @@ export default function TimeSlotCalendar() {
     const [hours, minutes] = startTime.split(":").map(Number);
     const slotTime = new Date(dateStr);
     slotTime.setHours(hours, minutes, 0, 0);
-    return slotTime >= minimumScheduleTime;
+    // return slotTime >= minimumScheduleTime;
+    return true;
   };
 
   // Tạo danh sách slot từ API và bổ sung các slots 30 phút chuẩn

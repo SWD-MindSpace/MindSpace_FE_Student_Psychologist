@@ -18,13 +18,9 @@ import { FaUser } from "react-icons/fa";
 import MotionHeading from "@/components/MotionHeading";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import {
-  AppointmentsResult,
-  getPsychologistsNames,
-  getUserAppointments,
-} from "@/lib/services/appointmentService";
 import { Appointment } from "@/types/appointment";
 import { AppointmentFilter } from "@/types/filters";
+import { PaginatedResponse } from "@/types/paginatedResponse";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -74,7 +70,14 @@ export default function AppointmentHistory() {
       const data = await response.json();
       setPsychologists(data);
       setLoadingPsychologists(false);
-    });
+    } catch (err) {
+      console.error("Error fetching psychologists:", err);
+      setError("Failed to load psychologists. Please try again later.");
+      toast.error("Failed to load psychologists");
+      setPsychologists([]);
+    } finally {
+      setLoadingPsychologists(false);
+    }
   };
 
   const fetchAppointments = async () => {
@@ -109,7 +112,9 @@ export default function AppointmentHistory() {
 
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/appointments/user?${queryParams.toString()}`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/appointments/user?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -335,10 +340,11 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
-                    ? "border-l-4 border-green-500"
-                    : "border-l-4 border-gray-300"
-                    }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
+                    appointment.isUpcoming
+                      ? "border-l-4 border-green-500"
+                      : "border-l-4 border-gray-300"
+                  }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">
