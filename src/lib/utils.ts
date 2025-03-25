@@ -23,7 +23,7 @@ export const registerForProgram = async (programId: number) => {
             return;
         }
 
-        const response = await fetch(`https://localhost:7096/api/v1/supporting-programs/register`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/supporting-programs/register`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,

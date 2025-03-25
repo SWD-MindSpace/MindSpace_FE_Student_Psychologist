@@ -37,7 +37,7 @@ export default function ResourcesPage() {
       try {
         const accessToken = localStorage.getItem('accessToken');
         const blogsResponse = await fetch(
-          `https://localhost:7096/api/v1/resources/blogs?pageIndex=${blogPageIndex}&pageSize=${pageSize}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/resources/blogs?pageIndex=${blogPageIndex}&pageSize=${pageSize}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken || ''}`,
@@ -46,7 +46,7 @@ export default function ResourcesPage() {
           }
         );
         const articlesResponse = await fetch(
-          `https://localhost:7096/api/v1/resources/articles?pageIndex=${articlePageIndex}&pageSize=${pageSize}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/resources/articles?pageIndex=${articlePageIndex}&pageSize=${pageSize}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken || ''}`,

@@ -43,7 +43,7 @@ export default function AllTests() {
         const fetchTests = async () => {
             try {
                 const response = await fetch(
-                    `https://localhost:7096/api/v1/tests?Title=&TestCode=&TargetUser=&MinPrice=&MaxPrice=&TestCategoryId=&SpecializationId=&Sort=&PageIndex=1&PageSize=10`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/tests?Title=&TestCode=&TargetUser=&MinPrice=&MaxPrice=&TestCategoryId=&SpecializationId=&Sort=&PageIndex=1&PageSize=10`,
                     {
                         method: 'GET',
                         headers: {
@@ -215,14 +215,14 @@ export default function AllTests() {
                                     <p className="text-gray-600 text-lg">{test.description}</p>
                                 </CardBody>
                                 <CardFooter className='px-6'>
-                                        <Button
-                                            variant="shadow"
-                                            className="mt-3 w-fit p-5 bg-second-color"
-                                            onPress={() => handleStartTest(test.id)}
-                                        >
-                                            Take Test
-                                        </Button>
-                                    </CardFooter>
+                                    <Button
+                                        variant="shadow"
+                                        className="mt-3 w-fit p-5 bg-second-color"
+                                        onPress={() => handleStartTest(test.id)}
+                                    >
+                                        Take Test
+                                    </Button>
+                                </CardFooter>
                             </Card>
                         ))}
                     </div>

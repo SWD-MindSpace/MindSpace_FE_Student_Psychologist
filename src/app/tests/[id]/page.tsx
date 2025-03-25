@@ -96,7 +96,7 @@ export default function TestPage() {
         }
         const fetchTest = async () => {
             try {
-                const response = await fetch(`https://localhost:7096/api/v1/tests/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tests/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
@@ -152,7 +152,7 @@ export default function TestPage() {
         };
 
         try {
-            const response = await fetch('https://localhost:7096/api/v1/test-responses', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/test-responses`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,

@@ -29,7 +29,7 @@ export default function ArticleDetailPage() {
 
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`https://localhost:7096/api/v1/resources/articles/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/articles/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export default function ArticleDetailPage() {
   useEffect(() => {
     const fetchRelatedArticles = async () => {
       try {
-        const response = await fetch('https://localhost:7096/api/v1/resources/articles?pageIndex=1&pageSize=6', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/articles?pageIndex=1&pageSize=6`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ export default function ArticleDetailPage() {
         </Link>
       </div>
 
-      <Divider className='h-1 mt-10 bg-sky-700 rounded-md'/> 
+      <Divider className='h-1 mt-10 bg-sky-700 rounded-md' />
 
       <div className='mt-12'>
         <h2 className='text-3xl font-extrabold text-center mb-6'>More to explore</h2>

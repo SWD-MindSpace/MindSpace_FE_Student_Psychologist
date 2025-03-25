@@ -7,8 +7,8 @@ import styles from "./styles/TimeslotCalendar.module.css";
 import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/ScheduleSchemas";
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 
-const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
-const bookingUrl = `https://localhost:7096/api/v1/appointments/booking/confirm`;
+const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/psychologist-schedules`;
+const bookingUrl = `${process.env.NEXT_PUBLIC_API_URL}/appointments/booking/confirm`;
 
 export default function TimeSlotCalendar() {
   const psychologistId = 8; // thay bằng get từ url gì đó bên list qua
@@ -214,11 +214,11 @@ export default function TimeSlotCalendar() {
     // Alert thông tin đặt lịch
     alert(
       "Booking Information:\n\n" +
-        `Date: ${bookingData.date}\n` +
-        `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
-        `Specialization ID: ${bookingData.specializationId}\n` +
-        `Psychologist ID: ${bookingData.psychologistId}\n` +
-        `Slot ID: ${bookingData.scheduleId || "Not available"}`
+      `Date: ${bookingData.date}\n` +
+      `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
+      `Specialization ID: ${bookingData.specializationId}\n` +
+      `Psychologist ID: ${bookingData.psychologistId}\n` +
+      `Slot ID: ${bookingData.scheduleId || "Not available"}`
     );
 
     await handleStripePayment(bookingData);

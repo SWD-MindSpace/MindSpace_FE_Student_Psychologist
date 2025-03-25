@@ -1,6 +1,6 @@
 import { ChatRequest, ChatResponse } from "@/types/chat";
 
-const CHAT_API_URL = "https://localhost:7096/api/v1/chat-agents/generate";
+const CHAT_API_URL = `${process.env.NEXT_PUBLIC_API_URL}/chat-agents/generate`;
 
 export const generateChatResponse = async (prompt: string): Promise<ChatResponse> => {
   try {

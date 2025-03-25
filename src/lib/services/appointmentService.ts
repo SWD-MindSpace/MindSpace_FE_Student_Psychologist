@@ -1,7 +1,7 @@
 import { Appointment } from "@/types/appointment";
 import { toast } from "react-hot-toast";
 
-const API_BASE_URL = "https://localhost:7096/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface AppointmentFilter {
   isUpcoming?: boolean;
@@ -118,9 +118,8 @@ export const getUserAppointments = async (
       }
     }
 
-    const url = `${API_BASE_URL}/appointments/user${
-      queryParams.toString() ? `?${queryParams.toString()}` : ""
-    }`;
+    const url = `${API_BASE_URL}/appointments/user${queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`;
 
     console.log("Appointments API URL:", url);
 

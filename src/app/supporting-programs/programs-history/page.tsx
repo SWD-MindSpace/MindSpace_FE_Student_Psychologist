@@ -39,7 +39,7 @@ export default function ProgramHistory() {
             setLoading(true);
             try {
                 const response = await fetch(
-                    `https://localhost:7096/api/v1/supporting-programs/history?StudentId=${userId}&pageIndex=${pageIndex}&pageSize=${pageSize}&Sort=joinedAtDesc`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs/history?StudentId=${userId}&pageIndex=${pageIndex}&pageSize=${pageSize}&Sort=joinedAtDesc`,
                     {
                         method: 'GET',
                         headers: {
