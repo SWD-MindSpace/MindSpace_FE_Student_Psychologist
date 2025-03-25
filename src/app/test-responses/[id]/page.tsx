@@ -28,7 +28,7 @@ export default function TestResponseDetail() {
     useEffect(() => {
         const fetchTestResponse = async () => {
             try {
-                const response = await fetch(`https://localhost:7096/api/v1/test-responses/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/test-responses/${id}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

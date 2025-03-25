@@ -20,7 +20,7 @@ const ConfirmAppointmentPopup: React.FC<ConfirmAppointmentPopupProps> = ({
   const [specializationId, setSpecializationId] = useState(0);
 
   // get from api
-  // var results = fetch(`https://localhost:7096/api/v1/specializations`);
+  // var results = fetch(`${process.env.NEXT_PUBLIC_API_URL}/specializations`);
   const specializations = [
     { id: "1", name: "General Medicine" },
     { id: "2", name: "Cardiology" },

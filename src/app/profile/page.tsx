@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, CardHeader, Button, Avatar } from "@heroui/react";
 
-const API_URL = "https://localhost:7096/api/v1/identities/profile/";
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/identities/profile/`;
 
 interface UserProfile {
   email: string;

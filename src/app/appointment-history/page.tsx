@@ -55,8 +55,23 @@ export default function AppointmentHistory() {
 
   const fetchPsychologists = async () => {
     setLoadingPsychologists(true);
-    await getPsychologistsNames().then((data) => {
-      console.log(data);
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken || ""}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch psychologists");
+      }
+
+      const data = await response.json();
       setPsychologists(data);
       setLoadingPsychologists(false);
     });
@@ -92,8 +107,23 @@ export default function AppointmentHistory() {
         queryParams.append("psychologistName", activeFilters.psychologistName);
       }
 
-      const data: AppointmentsResult = await getUserAppointments(activeFilters);
-      setAppointments(data.appointments);
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments/user?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken || ""}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appointments");
+      }
+
+      const data: PaginatedResponse<Appointment> = await response.json();
+      setAppointments(data.data);
       setTotalCount(data.count);
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -305,11 +335,10 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
-                    appointment.isUpcoming
-                      ? "border-l-4 border-green-500"
-                      : "border-l-4 border-gray-300"
-                  }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
+                    ? "border-l-4 border-green-500"
+                    : "border-l-4 border-gray-300"
+                    }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">
