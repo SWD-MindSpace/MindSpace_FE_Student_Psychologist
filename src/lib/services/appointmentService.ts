@@ -13,28 +13,16 @@ export interface AppointmentFilter {
   pageSize?: number;
 }
 
-export interface PaginatedResponse<T> {
-  pageIndex: number;
-  pageSize: number;
-  count: number;
-  data: T[];
-}
-
 export interface AppointmentsResult {
   appointments: Appointment[];
   count: number;
 }
 
-export interface Psychologist {
-  id: string;
-  fullName: string;
-}
-
-export const getPsychologists = async (): Promise<Psychologist[]> => {
+export const getPsychologistsNames = async (): Promise<string[]> => {
   try {
     console.log("Fetching psychologists...");
     const response = await fetch(
-      `${API_BASE_URL}/identities/accounts/psychologists`,
+      `${API_BASE_URL}/identities/accounts/psychologists/names`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -52,32 +40,7 @@ export const getPsychologists = async (): Promise<Psychologist[]> => {
     const data = await response.json();
     console.log("Psychologists API Response:", data);
 
-    // Check if the response is an array of strings (psychologist names)
-    if (Array.isArray(data) && data.every((item) => typeof item === "string")) {
-      console.log(`Found ${data.length} psychologists as name strings`);
-      // Map string names to Psychologist objects with generated IDs
-      return data.map((name: string, index) => ({
-        id: `psych-${index}`, // Generate an ID based on index
-        fullName: name,
-      }));
-    }
-
-    // Check if the response is an array of psychologist objects
-    if (Array.isArray(data) && data.length > 0 && typeof data[0] === "object") {
-      console.log(`Found ${data.length} psychologists in object format`);
-      return data;
-    }
-
-    // If the API returns a paginated response with data property
-    if (data && typeof data === "object" && Array.isArray(data.data)) {
-      console.log(
-        `Found ${data.data.length} psychologists in paginated format`
-      );
-      return data.data;
-    }
-
-    console.error("Unexpected API response format for psychologists:", data);
-    return [];
+    return data;
   } catch (err) {
     console.error("Error fetching psychologists:", err);
     toast.error("Failed to load psychologists");

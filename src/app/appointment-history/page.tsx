@@ -18,32 +18,13 @@ import { FaUser } from "react-icons/fa";
 import MotionHeading from "@/components/MotionHeading";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-
-// Define the Appointment interface directly here since we have the exact shape already
-interface Appointment {
-  date: string;
-  startTime: string;
-  endTime: string;
-  psychologistName: string;
-  isUpcoming: boolean;
-  meetUrl: string | null;
-}
-
-interface AppointmentFilter {
-  psychologistName?: string;
-  startDate?: string;
-  endDate?: string;
-  sort?: "dateAsc" | "dateDesc";
-  pageIndex?: number;
-  pageSize?: number;
-}
-
-interface PaginatedResponse<T> {
-  pageIndex: number;
-  pageSize: number;
-  count: number;
-  data: T[];
-}
+import {
+  AppointmentsResult,
+  getPsychologistsNames,
+  getUserAppointments,
+} from "@/lib/services/appointmentService";
+import { Appointment } from "@/types/appointment";
+import { AppointmentFilter } from "@/types/filters";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -74,30 +55,11 @@ export default function AppointmentHistory() {
 
   const fetchPsychologists = async () => {
     setLoadingPsychologists(true);
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        "https://localhost:7096/api/v1/identities/accounts/psychologists",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken || ""}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch psychologists");
-      }
-
-      const data = await response.json();
+    await getPsychologistsNames().then((data) => {
+      console.log(data);
       setPsychologists(data);
-    } catch (err) {
-      console.error("Error fetching psychologists:", err);
-      toast.error("Failed to load psychologists");
-    } finally {
       setLoadingPsychologists(false);
-    }
+    });
   };
 
   const fetchAppointments = async () => {
@@ -130,23 +92,8 @@ export default function AppointmentHistory() {
         queryParams.append("psychologistName", activeFilters.psychologistName);
       }
 
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `https://localhost:7096/api/v1/appointments/user?${queryParams.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken || ""}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch appointments");
-      }
-
-      const data: PaginatedResponse<Appointment> = await response.json();
-      setAppointments(data.data);
+      const data: AppointmentsResult = await getUserAppointments(activeFilters);
+      setAppointments(data.appointments);
       setTotalCount(data.count);
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -309,7 +256,7 @@ export default function AppointmentHistory() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Psychologist
+                    Tên chuyên gia tâm lí
                   </label>
                   <select
                     name="psychologistName"
@@ -320,7 +267,7 @@ export default function AppointmentHistory() {
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
                     disabled={loadingPsychologists}
                   >
-                    <option value="">All Psychologists</option>
+                    <option value="">Tất cả chuyên gia tâm lí</option>
                     {psychologists.map((name) => (
                       <option key={name} value={name}>
                         {name}
