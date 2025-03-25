@@ -77,7 +77,7 @@ export default function AppointmentHistory() {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        "https://localhost:7096/api/v1/identities/accounts/psychologists",
+        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -132,7 +132,7 @@ export default function AppointmentHistory() {
 
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        `https://localhost:7096/api/v1/appointments/user?${queryParams.toString()}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments/user?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -358,11 +358,10 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
-                    appointment.isUpcoming
-                      ? "border-l-4 border-green-500"
-                      : "border-l-4 border-gray-300"
-                  }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
+                    ? "border-l-4 border-green-500"
+                    : "border-l-4 border-gray-300"
+                    }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">

@@ -29,7 +29,7 @@ export default function ArticleDetailPage() {
 
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`https://localhost:7096/api/v1/resources/articles/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/articles/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export default function ArticleDetailPage() {
   useEffect(() => {
     const fetchRelatedArticles = async () => {
       try {
-        const response = await fetch('https://localhost:7096/api/v1/resources/articles?pageIndex=1&pageSize=6', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/articles?pageIndex=1&pageSize=6`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',

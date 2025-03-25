@@ -8,8 +8,8 @@ import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/Sche
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 import { useParams } from "next/navigation";
 
-const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
-const bookingUrl = `https://localhost:7096/api/v1/appointments/booking/confirm`;
+const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/psychologist-schedules`;
+const bookingUrl = `${process.env.NEXT_PUBLIC_API_URL}/appointments/booking/confirm`;
 
 export default function TimeSlotCalendar() {
   // const psychologistId = 8; // thay bằng get từ url gì đó bên list qua

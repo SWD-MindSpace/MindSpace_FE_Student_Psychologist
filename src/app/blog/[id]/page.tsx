@@ -35,7 +35,7 @@ export default function BlogDetailPage() {
 
     const fetchBlog = async () => {
       try {
-        const response = await fetch(`https://localhost:7096/api/v1/resources/blogs/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/blogs/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function BlogDetailPage() {
   useEffect(() => {
     const fetchRelatedBlogs = async () => {
       try {
-        const response = await fetch('https://localhost:7096/api/v1/resources/blogs?pageIndex=1&pageSize=6', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resources/blogs?pageIndex=1&pageSize=6`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',

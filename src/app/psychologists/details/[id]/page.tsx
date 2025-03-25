@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { Avatar, Button, Card, Divider } from '@heroui/react';
 import { FaStar, FaUserDoctor, FaEnvelope } from "react-icons/fa6";
 
-const BASE_URL = "https://localhost:7096/api/v1/identities/accounts/psychologists";
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`;
 
 type Feedback = {
     rating: number;
@@ -66,7 +66,7 @@ const PsychologistDetailPage = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className='grid grid-cols-2 pb-6'> 
+            <div className='grid grid-cols-2 pb-6'>
                 <div className="flex items-center gap-6">
                     <Avatar
                         src={psychologist?.imageUrl || '/default-avatar.png'}
@@ -75,7 +75,7 @@ const PsychologistDetailPage = () => {
                     />
                     <div>
                         <h1 className="text-2xl font-semibold flex items-center gap-2">
-                            <FaUserDoctor className='text-primary-blue'/> {psychologist?.fullName}
+                            <FaUserDoctor className='text-primary-blue' /> {psychologist?.fullName}
                         </h1>
                         <p className="text-lg text-gray-600">{psychologist?.specialization.name}</p>
                         <p className="flex items-center text-lg font-medium mt-1 gap-2">

@@ -52,10 +52,10 @@ export default function SupportingPrograms() {
       setLoading(true);
       const accessToken = localStorage.getItem("accessToken");
       const userId = localStorage.getItem("userId");
-  
+
       try {
         const programsResponse = await fetch(
-          `https://localhost:7096/api/v1/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100`,
+          `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100`,
           {
             method: "GET",
             headers: {
@@ -64,19 +64,19 @@ export default function SupportingPrograms() {
             },
           }
         );
-  
+
         if (!programsResponse.ok) {
           throw new Error("Failed to fetch programs");
         }
         const programsData = await programsResponse.json();
-        
+
         // Filter only active programs
         let availablePrograms = programsData.data.filter((p: SupportingProgram) => p.isActive);
-  
+
         // If user is logged in, fetch registered programs and filter
         if (accessToken && userId) {
           const registeredResponse = await fetch(
-            `https://localhost:7096/api/v1/supporting-programs/history?StudentId=${userId}&pageIndex=1&pageSize=1000`,
+            `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs/history?StudentId=${userId}&pageIndex=1&pageSize=1000`,
             {
               method: "GET",
               headers: {
@@ -85,7 +85,7 @@ export default function SupportingPrograms() {
               },
             }
           );
-  
+
           if (!registeredResponse.ok) {
             throw new Error("Failed to fetch registered programs");
           }
@@ -94,12 +94,12 @@ export default function SupportingPrograms() {
             (p: SupportingProgram) => p.id
           );
           setRegisteredProgramIds(registeredIds);
-  
+
           availablePrograms = availablePrograms.filter(
             (program: SupportingProgram) => !registeredIds.includes(program.id)
           );
         }
-  
+
         setAllPrograms(availablePrograms);
         setTotalPages(Math.ceil(availablePrograms.length / pageSize));
       } catch (error) {
@@ -108,7 +108,7 @@ export default function SupportingPrograms() {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 

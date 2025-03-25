@@ -6,7 +6,7 @@ import { FaStar, FaUserDoctor, FaLock } from "react-icons/fa6";
 import { useRouter } from 'next/navigation';
 import MotionHeading from '@/components/MotionHeading';
 
-const BASE_URL = "https://localhost:7096/api/v1/identities/accounts/psychologists";
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`;
 
 type Psychologist = {
     id: number;

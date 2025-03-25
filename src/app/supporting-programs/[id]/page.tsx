@@ -30,7 +30,7 @@ export default function ProgramDetail() {
     useEffect(() => {
         const fetchProgramDetails = async () => {
             try {
-                const response = await fetch(`https://localhost:7096/api/v1/supporting-programs/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/supporting-programs/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
