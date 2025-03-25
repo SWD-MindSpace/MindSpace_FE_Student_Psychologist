@@ -90,7 +90,13 @@ const PsychologistDetailPage = () => {
                     </div>
                 </div>
                 <div className="flex items-end justify-end">
-                    <Button variant='bordered' className="bg-purple-600 text-white px-6 py-2 rounded">Book Now</Button>
+                    <Button 
+                    variant='bordered' 
+                    className="bg-purple-600 text-white px-6 py-2 rounded"
+                    onPress={() => router.push(`/psychologists/${id}`)}
+                    >
+                        Book Now
+                        </Button>
                 </div>
             </div>
 

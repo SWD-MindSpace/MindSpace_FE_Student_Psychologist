@@ -114,12 +114,14 @@ export default function ArticleDetailPage() {
 
       <Divider className='h-1 w-1/2 mx-auto bg-sky-700 rounded-md mb-10' />
       <div className="text-center">
-        <Link href={article.articleUrl} target="_blank" rel="noopener noreferrer" className="text-white bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-md">
-          Read Full Article ↗
-        </Link>
+        <a href="https://res.cloudinary.com/ddewgbug1/image/upload/v1742910220/yg80vkpjvzwgsdpvciou.pdf"
+          download
+          className="text-white bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-md">
+          Download PDF ⬇
+        </a>
       </div>
 
-      <Divider className='h-1 mt-10 bg-sky-700 rounded-md'/> 
+      <Divider className='h-1 mt-10 bg-sky-700 rounded-md' />
 
       <div className='mt-12'>
         <h2 className='text-3xl font-extrabold text-center mb-6'>More to explore</h2>
