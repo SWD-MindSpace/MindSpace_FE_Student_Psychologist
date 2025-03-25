@@ -6,12 +6,18 @@ import "react-datepicker/dist/react-datepicker.css";
 import styles from "./styles/TimeslotCalendar.module.css";
 import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/ScheduleSchemas";
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
+import { useParams } from "next/navigation";
 
 const baseUrl = `https://localhost:7096/api/v1/psychologist-schedules`;
 const bookingUrl = `https://localhost:7096/api/v1/appointments/booking/confirm`;
 
 export default function TimeSlotCalendar() {
-  const psychologistId = 8; // thay bằng get từ url gì đó bên list qua
+  // const psychologistId = 8; // thay bằng get từ url gì đó bên list qua
+  const { id } = useParams();
+  const psychologistId = Number(id);
+
+  console.log("Raw id from useParams:", id); 
+  console.log("Parsed psychologistId:", psychologistId);
 
   const getDate = (fromDate?: Date): Date => {
     const date = fromDate ? new Date(fromDate) : new Date();
@@ -214,11 +220,11 @@ export default function TimeSlotCalendar() {
     // Alert thông tin đặt lịch
     alert(
       "Booking Information:\n\n" +
-        `Date: ${bookingData.date}\n` +
-        `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
-        `Specialization ID: ${bookingData.specializationId}\n` +
-        `Psychologist ID: ${bookingData.psychologistId}\n` +
-        `Slot ID: ${bookingData.scheduleId || "Not available"}`
+      `Date: ${bookingData.date}\n` +
+      `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
+      `Specialization ID: ${bookingData.specializationId}\n` +
+      `Psychologist ID: ${bookingData.psychologistId}\n` +
+      `Slot ID: ${bookingData.scheduleId || "Not available"}`
     );
 
     await handleStripePayment(bookingData);

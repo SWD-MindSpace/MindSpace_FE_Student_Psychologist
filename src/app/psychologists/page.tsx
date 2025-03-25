@@ -141,7 +141,9 @@ const PsychologistPage = () => {
                                             >
                                                 View Detail
                                             </Button>
-                                            <Button className="w-32 text-sm bg-purple-600">Book Now</Button>
+                                            <Button className="w-32 text-sm bg-purple-600"
+                                            onPress={() => router.push(`/psychologists/${psychologist.id}`)}
+                                            >Book Now</Button>
                                         </div>
                                     </div>
                                 </div>
