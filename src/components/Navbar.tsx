@@ -148,6 +148,13 @@ export default function TopNav() {
                   </Link>
                 </DropdownItem>
               ) : null}
+              {userRole === "Psychologist" ? (
+                <DropdownItem key="schedules">
+                  <Link href="/schedules">
+                    Quản lý lịch làm việc
+                  </Link>
+                </DropdownItem>
+              ) : null}
               <DropdownItem
                 key="logout"
                 onPress={logout}

@@ -138,8 +138,7 @@ export default function AppointmentHistory() {
       }
 
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL
+        `${process.env.NEXT_PUBLIC_API_URL
         }${endpoint}?${queryParams.toString()}`,
         {
           headers: {
@@ -154,6 +153,7 @@ export default function AppointmentHistory() {
       }
 
       const data: PaginatedResponse<Appointment> = await response.json();
+      console.log(data)
       setAppointments(data.data);
       setTotalCount(data.count);
     } catch (err) {
@@ -459,11 +459,10 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
-                    appointment.isUpcoming
-                      ? "border-l-4 border-green-500"
-                      : "border-l-4 border-gray-300"
-                  }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
+                    ? "border-l-4 border-green-500"
+                    : "border-l-4 border-gray-300"
+                    }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">
@@ -497,7 +496,6 @@ export default function AppointmentHistory() {
                       </div>
 
                       <Divider />
-
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex items-center text-gray-700">
                           <span className="font-medium">Status:</span>
@@ -512,7 +510,12 @@ export default function AppointmentHistory() {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link href={`/appointment-history/${appointment.id}/appointment-notes`}>
+                            <Button className="flex items-center" color="default">
+                              Appointment Notes
+                            </Button>
+                          </Link>
                           {appointment.meetUrl ? (
                             <Link
                               href={appointment.meetUrl}
