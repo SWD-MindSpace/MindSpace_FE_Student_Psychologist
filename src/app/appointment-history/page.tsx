@@ -40,21 +40,24 @@ export default function AppointmentHistory() {
   const [showFilters, setShowFilters] = useState(false);
   const [psychologists, setPsychologists] = useState<string[]>([]);
   const [loadingPsychologists, setLoadingPsychologists] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAppointments();
   }, [activeFilters]);
 
   useEffect(() => {
-    fetchPsychologists();
-  }, []);
+    if (userRole === "Student") {
+      fetchPsychologists();
+    }
+  }, [userRole]);
 
   const fetchPsychologists = async () => {
     setLoadingPsychologists(true);
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`,
+        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists/names`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -83,6 +86,26 @@ export default function AppointmentHistory() {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
+      // Get user role from token and determine API endpoint
+      const idToken = localStorage.getItem("idToken");
+      const accessToken = localStorage.getItem("accessToken");
+      let endpoint = "/appointments/user";
+
+      if (idToken) {
+        try {
+          const payload = JSON.parse(atob(idToken.split(".")[1]));
+          const roleId = payload["role"];
+
+          setUserRole(roleId);
+          if (roleId === "Psychologist") {
+            endpoint = "/appointments/psychologist";
+          }
+          // Student and Parent roles use the default endpoint
+        } catch (error) {
+          console.error("Error decoding ID token:", error);
+        }
+      }
+
       // Construct query params
       const queryParams = new URLSearchParams();
 
@@ -110,11 +133,10 @@ export default function AppointmentHistory() {
         queryParams.append("psychologistName", activeFilters.psychologistName);
       }
 
-      const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
         `${
           process.env.NEXT_PUBLIC_API_URL
-        }/appointments/user?${queryParams.toString()}`,
+        }${endpoint}?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -289,9 +311,10 @@ export default function AppointmentHistory() {
                   </Select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tên chuyên gia tâm lí
+                {userRole === "Student" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tên chuyên gia tâm lí
                   </label>
                   <select
                     name="psychologistName"
@@ -308,8 +331,9 @@ export default function AppointmentHistory() {
                         {name}
                       </option>
                     ))}
-                  </select>
-                </div>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 mt-4">
@@ -365,9 +389,14 @@ export default function AppointmentHistory() {
 
                         <div className="flex items-center text-gray-700">
                           <FaUser className="mr-2" />
-                          <span className="font-medium">Psychologist:</span>
+                          <span className="font-medium">
+                            {appointment.psychologistName
+                              ? "Psychologist:"
+                              : "Student:"}
+                          </span>
                           <span className="ml-2">
-                            {appointment.psychologistName}
+                            {appointment.psychologistName ||
+                              appointment.studentName}
                           </span>
                         </div>
                       </div>
