@@ -17,6 +17,11 @@ export default {
         "black": "var(--black)",
         "bg-gray": "var(--bg-gray)",
         "txt-gray": "var(--txt-gray)",
+        "first-color": "var(--first-color)",
+        "second-color": "var(--second-color)",
+        "third-color": "var(--third-color)",
+        "fourth-color": "var(--fourth-color)",
+        "fifth-color": "var(--fifth-color)",
       },
       fontFamily: {
         'bevnpro': ['Be Vietnam Pro'], // Big headings
