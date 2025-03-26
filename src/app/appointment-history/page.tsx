@@ -91,6 +91,10 @@ export default function AppointmentHistory() {
       const accessToken = localStorage.getItem("accessToken");
       let endpoint = "/appointments/user";
 
+      // Add WebRTC connectivity test
+      console.log("Starting WebRTC connectivity test...");
+      checkWebRTCConnectivity();
+
       if (idToken) {
         try {
           const payload = JSON.parse(atob(idToken.split(".")[1]));
@@ -234,6 +238,97 @@ export default function AppointmentHistory() {
   // Calculate total pages for pagination
   const totalPages = Math.ceil(totalCount / (activeFilters.pageSize || 5));
 
+  // Function to check WebRTC connectivity and detect NAT/firewall issues
+  const checkWebRTCConnectivity = () => {
+    try {
+      // Create RTCPeerConnection with STUN servers
+      const configuration = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+        ],
+        iceCandidatePoolSize: 10,
+      };
+
+      const pc = new RTCPeerConnection(configuration);
+
+      // Log ice gathering state changes
+      pc.addEventListener("icegatheringstatechange", () => {
+        console.log(`ICE gathering state: ${pc.iceGatheringState}`);
+      });
+
+      // Log connection state changes
+      pc.addEventListener("connectionstatechange", () => {
+        console.log(`Connection state: ${pc.connectionState}`);
+      });
+
+      // Create data channel (needed to start ICE gathering)
+      pc.createDataChannel("connectivity-test");
+
+      // Log ICE candidates
+      pc.addEventListener("icecandidate", (event) => {
+        if (event.candidate) {
+          console.log("STUN server returned ICE candidate:", {
+            address: event.candidate.address,
+            port: event.candidate.port,
+            protocol: event.candidate.protocol,
+            type: event.candidate.type,
+            candidateType: event.candidate.candidateType,
+            relatedAddress: event.candidate.relatedAddress,
+            relatedPort: event.candidate.relatedPort,
+            raw: event.candidate.candidate,
+          });
+
+          // Check for symmetric NAT (if we only get reflexive candidates with relatedAddress)
+          if (
+            event.candidate.type === "srflx" &&
+            !event.candidate.relatedAddress
+          ) {
+            console.log(
+              "WARNING: Possible symmetric NAT detected - may cause connection issues"
+            );
+          }
+        }
+      });
+
+      // Create offer to start ICE gathering
+      pc.createOffer()
+        .then((offer) => pc.setLocalDescription(offer))
+        .then(() => {
+          console.log("Local description set, ICE gathering started");
+
+          // Set a timeout to check if we got any server reflexive candidates
+          setTimeout(() => {
+            if (!pc.localDescription) {
+              console.log(
+                "ERROR: No local description set - firewall may be blocking STUN"
+              );
+              return;
+            }
+
+            const sdp = pc.localDescription.sdp;
+            if (!sdp.includes("typ srflx")) {
+              console.log(
+                "WARNING: No server reflexive candidates found - firewall may be blocking STUN"
+              );
+            } else {
+              console.log(
+                "Server reflexive candidates found - STUN is working"
+              );
+            }
+
+            // Clean up
+            pc.close();
+          }, 5000);
+        })
+        .catch((err) => {
+          console.error("Error during WebRTC connectivity test:", err);
+        });
+    } catch (err) {
+      console.error("Error setting up WebRTC connectivity test:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -315,22 +410,22 @@ export default function AppointmentHistory() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tên chuyên gia tâm lí
-                  </label>
-                  <select
-                    name="psychologistName"
-                    value={filters.psychologistName || ""}
-                    onChange={(e) => {
-                      handleFilterChange("psychologistName", e.target.value);
-                    }}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
-                    disabled={loadingPsychologists}
-                  >
-                    <option value="">Tất cả chuyên gia tâm lí</option>
-                    {psychologists.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
-                      </option>
-                    ))}
+                    </label>
+                    <select
+                      name="psychologistName"
+                      value={filters.psychologistName || ""}
+                      onChange={(e) => {
+                        handleFilterChange("psychologistName", e.target.value);
+                      }}
+                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
+                      disabled={loadingPsychologists}
+                    >
+                      <option value="">Tất cả chuyên gia tâm lí</option>
+                      {psychologists.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )}
