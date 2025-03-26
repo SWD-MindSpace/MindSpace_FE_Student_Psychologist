@@ -5,11 +5,38 @@ import * as signalR from "@microsoft/signalr";
 class WebRTCService {
   private servers = {
     iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun.l.google.com:5349" },
+      { urls: "stun:stun1.l.google.com:3478" },
+      { urls: "stun:stun1.l.google.com:5349" },
+      { urls: "stun:stun2.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:5349" },
+      { urls: "stun:stun3.l.google.com:3478" },
+      { urls: "stun:stun3.l.google.com:5349" },
+      { urls: "stun:stun4.l.google.com:19302" },
+      { urls: "stun:stun4.l.google.com:5349" },
       {
-        urls: [
-          "stun:stun1.l.google.com:19302",
-          "stun:stun2.l.google.com:19302",
-        ],
+        urls: "stun:stun.relay.metered.ca:80",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "c25b233a28eae1c1638e1e1a",
+        credential: "TJEsJh/jX/7rgRFB",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "c25b233a28eae1c1638e1e1a",
+        credential: "TJEsJh/jX/7rgRFB",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "c25b233a28eae1c1638e1e1a",
+        credential: "TJEsJh/jX/7rgRFB",
+      },
+      {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "c25b233a28eae1c1638e1e1a",
+        credential: "TJEsJh/jX/7rgRFB",
       },
     ],
   };
