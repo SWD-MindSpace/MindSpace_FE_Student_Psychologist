@@ -41,6 +41,14 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
   /**
    * Initialize WebRTC and handle SignalR connection
    */
+  const stopWebcam = () => {
+    if (localVideoRef.current?.srcObject) {
+      const stream = localVideoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      localVideoRef.current.srcObject = null;
+    }
+  };
+
   useEffect(() => {
     const initializeConnection = async () => {
       try {
@@ -60,6 +68,10 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
           // Start SignalR connection and wait for it to establish
           await webRTCService.startConnection();
           await webRTCService.joinRoom(roomId);
+        } else if (webRTCService.getConnectionState() === "Connecting") {
+          console.log(
+            "Connection already in progress, waiting for it to complete"
+          );
         } else {
           console.log(
             "Connection already in progress or connected, skipping initialization"
@@ -82,26 +94,28 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
     };
 
     initializeConnection();
+  }, [roomId]);
 
-    // Cleanup function
-    return () => {
-      try {
-        if (
-          isSignalRConnected &&
-          webRTCService.getConnectionState() === "Connected"
-        ) {
-          webRTCService.leaveRoom();
-        }
-        // Stop webcam
-        if (localVideoRef.current?.srcObject) {
-          const stream = localVideoRef.current.srcObject as MediaStream;
-          stream.getTracks().forEach((track) => track.stop());
-        }
-      } catch (error) {
-        console.error("Cleanup error:", error);
+  /**
+   * Handle page unload to ensure proper cleanup of media resources
+   */
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      stopWebcam();
+
+      if (isSignalRConnected) {
+        webRTCService.leaveRoom();
       }
     };
-  }, [roomId]);
+
+    // Add event listener for page unload
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isSignalRConnected]);
 
   const startWebcam = async () => {
     if (isWebcamActive.current) return;
@@ -211,11 +225,7 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
   const handleLeaveRoom = async () => {
     try {
       // Stop all tracks first to ensure proper cleanup
-      if (localVideoRef.current?.srcObject) {
-        const stream = localVideoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-        localVideoRef.current.srcObject = null;
-      }
+      stopWebcam();
 
       // Clear remote stream
       if (remoteVideoRef.current?.srcObject) {
