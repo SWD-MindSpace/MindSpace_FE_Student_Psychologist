@@ -68,7 +68,7 @@ export default function TopNav() {
           </DropdownTrigger>
           <DropdownMenu>
             <DropdownItem key="book-appointment">
-              <Link href="#">Đặt cuộc hẹn</Link>
+              <Link href="/psychologists">Đặt cuộc hẹn</Link>
             </DropdownItem>
             <DropdownItem key="appointment-history">
               <Link href="/appointment-history">Lịch sử cuộc hẹn</Link>

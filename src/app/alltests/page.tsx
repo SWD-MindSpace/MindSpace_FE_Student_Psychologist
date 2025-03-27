@@ -175,7 +175,7 @@ export default function AllTests() {
                         <>
                             <Divider className="my-10 w-1/2 mx-auto" />
                             <MotionHeading className='text-center mb-6'>
-                                Periodc Tests
+                                Periodic Tests
                             </MotionHeading>
                             <div className="grid gap-6">
                                 {periodicTests.map((test) => (
