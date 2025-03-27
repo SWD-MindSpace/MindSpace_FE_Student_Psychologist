@@ -55,7 +55,7 @@ export default function SupportingPrograms() {
 
       try {
         const programsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100`,
+          `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100&IsActive=true`,
           {
             method: "GET",
             headers: {
