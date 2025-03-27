@@ -414,8 +414,7 @@ class WebRTCService {
           // Handle different signaling states properly
           if (peerConnection!.signalingState !== "stable") {
             console.log(
-              `Peer connection not in stable state (${
-                peerConnection!.signalingState
+              `Peer connection not in stable state (${peerConnection!.signalingState
               }), rolling back...`
             );
 
@@ -477,8 +476,7 @@ class WebRTCService {
             }
           } else {
             console.warn(
-              `Cannot set local description: Signaling state is ${
-                peerConnection!.signalingState
+              `Cannot set local description: Signaling state is ${peerConnection!.signalingState
               }, expected 'have-remote-offer'`
             );
           }

@@ -1,0 +1,18 @@
+.star-svg {
+  display: inline;
+}
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Add any additional rating-specific styles here */
+.star {
+  transition: transform 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
