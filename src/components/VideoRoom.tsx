@@ -19,9 +19,10 @@ import {
  */
 interface VideoRoomProps {
   roomId: string;
+  onCallEnd?: () => void;
 }
 
-export default function VideoRoom({ roomId }: VideoRoomProps) {
+export default function VideoRoom({ roomId, onCallEnd }: VideoRoomProps) {
   const router = useRouter();
   // Refs for video elements
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -241,12 +242,15 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
       // Force disconnect to ensure clean state for next connection
       await webRTCService.forceDisconnect();
 
+      // Trigger the onCallEnd callback if provided
+      if (onCallEnd) {
+        onCallEnd();
+      }
+
       toast.success("Left the room successfully");
-      router.push("/video-chat");
     } catch (error) {
       console.error("Error leaving room:", error);
-      toast.error("Failed to leave room properly, redirecting anyway");
-      router.push("/video-chat");
+      toast.error("Failed to leave room properly");
     }
   };
 
@@ -330,19 +334,18 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
       <div className="max-w-6xl mx-auto">
         {/* Connection Status Bar */}
         <div
-          className={`mb-4 p-3 rounded-lg text-white text-center ${
-            isReconnecting
-              ? "bg-yellow-600"
-              : isSignalRConnected
+          className={`mb-4 p-3 rounded-lg text-white text-center ${isReconnecting
+            ? "bg-yellow-600"
+            : isSignalRConnected
               ? "bg-green-600"
               : "bg-red-600"
-          }`}
+            }`}
         >
           {isReconnecting
             ? `Reconnecting... Attempt ${reconnectAttempts.current}/${MAX_RECONNECT_ATTEMPTS}`
             : isSignalRConnected
-            ? `Connected to room: ${roomId}`
-            : "Connecting to server..."}
+              ? `Connected to room: ${roomId}`
+              : "Connecting to server..."}
         </div>
 
         {/* Video Grid */}
@@ -405,11 +408,10 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
           {/* Microphone Toggle Button */}
           <button
             onClick={toggleAudio}
-            className={`p-4 rounded-full ${
-              isAudioEnabled
-                ? "bg-gray-600 hover:bg-gray-700"
-                : "bg-red-600 hover:bg-red-700"
-            } transition-colors`}
+            className={`p-4 rounded-full ${isAudioEnabled
+              ? "bg-gray-600 hover:bg-gray-700"
+              : "bg-red-600 hover:bg-red-700"
+              } transition-colors`}
           >
             {isAudioEnabled ? (
               <FaMicrophone className="w-6 h-6 text-white" />
@@ -421,11 +423,10 @@ export default function VideoRoom({ roomId }: VideoRoomProps) {
           {/* Camera Toggle Button */}
           <button
             onClick={toggleVideo}
-            className={`p-4 rounded-full ${
-              isVideoEnabled
-                ? "bg-gray-600 hover:bg-gray-700"
-                : "bg-red-600 hover:bg-red-700"
-            } transition-colors`}
+            className={`p-4 rounded-full ${isVideoEnabled
+              ? "bg-gray-600 hover:bg-gray-700"
+              : "bg-red-600 hover:bg-red-700"
+              } transition-colors`}
           >
             {isVideoEnabled ? (
               <FaVideo className="w-6 h-6 text-white" />

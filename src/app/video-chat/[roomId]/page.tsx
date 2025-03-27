@@ -1,25 +1,32 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import VideoRoom from "@/components/VideoRoom";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
+import FeedbackModal from "@/components/modals/FeedbackModal";
 
 export default function VideoRoomPage() {
+  const [modalOpen, setModalOpen] = useState(false);
   const { roomId } = useParams();
-  const { user } = useAuth();
   const router = useRouter();
 
-  // useEffect(() => {
-  //     if (!user) {
-  //         router.push('/login');
-  //     }
-  // }, [user, router]);
+  const handleModalClose = () => {
+    setModalOpen(false);
+    router.push("/video-chat");
+  };
 
-  // if (!user || !roomId) {
-  //     return null;
-  // }
+  return (
+    <div className="relative">
+      <VideoRoom
+        roomId={roomId as string}
+        onCallEnd={() => setModalOpen(true)}
+      />
 
-  return <VideoRoom roomId={roomId as string} />;
+      <FeedbackModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        roomId={roomId as string}
+      />
+    </div>
+  );
 }
