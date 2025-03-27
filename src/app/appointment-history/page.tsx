@@ -91,10 +91,6 @@ export default function AppointmentHistory() {
       const accessToken = localStorage.getItem("accessToken");
       let endpoint = "/appointments/user";
 
-      // Add WebRTC connectivity test
-      console.log("Starting WebRTC connectivity test...");
-      checkWebRTCConnectivity();
-
       if (idToken) {
         try {
           const payload = JSON.parse(atob(idToken.split(".")[1]));
@@ -138,7 +134,8 @@ export default function AppointmentHistory() {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL
+        `${
+          process.env.NEXT_PUBLIC_API_URL
         }${endpoint}?${queryParams.toString()}`,
         {
           headers: {
@@ -153,7 +150,7 @@ export default function AppointmentHistory() {
       }
 
       const data: PaginatedResponse<Appointment> = await response.json();
-      console.log(data)
+      console.log(data);
       setAppointments(data.data);
       setTotalCount(data.count);
     } catch (err) {
@@ -237,97 +234,6 @@ export default function AppointmentHistory() {
 
   // Calculate total pages for pagination
   const totalPages = Math.ceil(totalCount / (activeFilters.pageSize || 5));
-
-  // Function to check WebRTC connectivity and detect NAT/firewall issues
-  const checkWebRTCConnectivity = () => {
-    try {
-      // Create RTCPeerConnection with STUN servers
-      const configuration = {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" },
-        ],
-        iceCandidatePoolSize: 10,
-      };
-
-      const pc = new RTCPeerConnection(configuration);
-
-      // Log ice gathering state changes
-      pc.addEventListener("icegatheringstatechange", () => {
-        console.log(`ICE gathering state: ${pc.iceGatheringState}`);
-      });
-
-      // Log connection state changes
-      pc.addEventListener("connectionstatechange", () => {
-        console.log(`Connection state: ${pc.connectionState}`);
-      });
-
-      // Create data channel (needed to start ICE gathering)
-      pc.createDataChannel("connectivity-test");
-
-      // Log ICE candidates
-      pc.addEventListener("icecandidate", (event) => {
-        if (event.candidate) {
-          console.log("STUN server returned ICE candidate:", {
-            address: event.candidate.address,
-            port: event.candidate.port,
-            protocol: event.candidate.protocol,
-            type: event.candidate.type,
-            candidateType: event.candidate.candidateType,
-            relatedAddress: event.candidate.relatedAddress,
-            relatedPort: event.candidate.relatedPort,
-            raw: event.candidate.candidate,
-          });
-
-          // Check for symmetric NAT (if we only get reflexive candidates with relatedAddress)
-          if (
-            event.candidate.type === "srflx" &&
-            !event.candidate.relatedAddress
-          ) {
-            console.log(
-              "WARNING: Possible symmetric NAT detected - may cause connection issues"
-            );
-          }
-        }
-      });
-
-      // Create offer to start ICE gathering
-      pc.createOffer()
-        .then((offer) => pc.setLocalDescription(offer))
-        .then(() => {
-          console.log("Local description set, ICE gathering started");
-
-          // Set a timeout to check if we got any server reflexive candidates
-          setTimeout(() => {
-            if (!pc.localDescription) {
-              console.log(
-                "ERROR: No local description set - firewall may be blocking STUN"
-              );
-              return;
-            }
-
-            const sdp = pc.localDescription.sdp;
-            if (!sdp.includes("typ srflx")) {
-              console.log(
-                "WARNING: No server reflexive candidates found - firewall may be blocking STUN"
-              );
-            } else {
-              console.log(
-                "Server reflexive candidates found - STUN is working"
-              );
-            }
-
-            // Clean up
-            pc.close();
-          }, 5000);
-        })
-        .catch((err) => {
-          console.error("Error during WebRTC connectivity test:", err);
-        });
-    } catch (err) {
-      console.error("Error setting up WebRTC connectivity test:", err);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -459,10 +365,11 @@ export default function AppointmentHistory() {
               {appointments.map((appointment, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${appointment.isUpcoming
-                    ? "border-l-4 border-green-500"
-                    : "border-l-4 border-gray-300"
-                    }`}
+                  className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
+                    appointment.isUpcoming
+                      ? "border-l-4 border-green-500"
+                      : "border-l-4 border-gray-300"
+                  }`}
                 >
                   <CardHeader className="bg-secondary-blue text-white py-4 px-6">
                     <h3 className="text-xl font-semibold font-bevnpro">
@@ -511,8 +418,13 @@ export default function AppointmentHistory() {
                         </div>
 
                         <div className="flex items-center justify-end gap-2">
-                          <Link href={`/appointment-history/${appointment.id}/appointment-notes`}>
-                            <Button className="flex items-center" color="default">
+                          <Link
+                            href={`/appointment-history/${appointment.id}/appointment-notes`}
+                          >
+                            <Button
+                              className="flex items-center"
+                              color="default"
+                            >
                               Appointment Notes
                             </Button>
                           </Link>
