@@ -8,12 +8,12 @@ import {
   Divider,
   Button,
   Spinner,
-  Input,
   Select,
   SelectItem,
   Pagination,
+  Input,
 } from "@heroui/react";
-import { BiTime, BiVideo, BiFilterAlt } from "react-icons/bi";
+import { BiTime, BiVideo } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
 import MotionHeading from "@/components/MotionHeading";
 import { toast } from "react-hot-toast";
@@ -21,6 +21,7 @@ import Link from "next/link";
 import { Appointment } from "@/types/appointment";
 import { AppointmentFilter } from "@/types/filters";
 import { PaginatedResponse } from "@/types/paginatedResponse";
+import FilterButton from "@/components/FilterButton";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -40,17 +41,14 @@ export default function AppointmentHistory() {
   const [showFilters, setShowFilters] = useState(false);
   const [psychologists, setPsychologists] = useState<string[]>([]);
   const [loadingPsychologists, setLoadingPsychologists] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAppointments();
   }, [activeFilters]);
 
   useEffect(() => {
-    if (userRole === "Student") {
-      fetchPsychologists();
-    }
-  }, [userRole]);
+    fetchPsychologists();
+  }, []);
 
   const fetchPsychologists = async () => {
     setLoadingPsychologists(true);
@@ -87,24 +85,8 @@ export default function AppointmentHistory() {
     setLoading(true);
     try {
       // Get user role from token and determine API endpoint
-      const idToken = localStorage.getItem("idToken");
       const accessToken = localStorage.getItem("accessToken");
-      let endpoint = "/appointments/user";
-
-      if (idToken) {
-        try {
-          const payload = JSON.parse(atob(idToken.split(".")[1]));
-          const roleId = payload["role"];
-
-          setUserRole(roleId);
-          if (roleId === "Psychologist") {
-            endpoint = "/appointments/psychologist";
-          }
-          // Student and Parent roles use the default endpoint
-        } catch (error) {
-          console.error("Error decoding ID token:", error);
-        }
-      }
+      const endpoint = "/appointments/user";
 
       // Construct query params
       const queryParams = new URLSearchParams();
@@ -245,54 +227,47 @@ export default function AppointmentHistory() {
           </p>
         </div>
 
-        <div className="mb-6">
-          <Button
-            color="default"
-            className="flex items-center gap-2"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <BiFilterAlt />
-            {showFilters ? "Hide Filters" : "Show Filters"}
-          </Button>
-        </div>
+        <FilterButton
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
 
         {showFilters && (
           <Card className="mb-8 shadow-md">
             <CardBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
+                  <label className="text-sm font-medium text-gray-700 mb-5">
+                    Tìm lịch hẹn bắt đầu từ
                   </label>
-                  <Input
-                    type="date"
-                    value={filters.startDate || ""}
-                    onChange={(e) =>
-                      handleFilterChange("startDate", e.target.value)
-                    }
-                    className="w-full"
-                    max={filters.endDate || undefined}
-                  />
+                  <div className="flex flex-row gap-2">
+                    <Input
+                      type="date"
+                      value={filters.startDate || ""}
+                      onChange={(e) =>
+                        handleFilterChange("startDate", e.target.value)
+                      }
+                      className="w-full"
+                      max={filters.endDate || undefined}
+                    />
+                    Đến
+                    <Input
+                      type="date"
+                      value={filters.endDate || ""}
+                      onChange={(e) =>
+                        handleFilterChange("endDate", e.target.value)
+                      }
+                      className="w-full"
+                      min={filters.startDate || undefined}
+                    />
+                  </div>
                 </div>
+
+                <div></div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date
-                  </label>
-                  <Input
-                    type="date"
-                    value={filters.endDate || ""}
-                    onChange={(e) =>
-                      handleFilterChange("endDate", e.target.value)
-                    }
-                    className="w-full"
-                    min={filters.startDate || undefined}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sort By
+                    Sắp xếp theo
                   </label>
                   <Select
                     name="sort"
@@ -304,45 +279,41 @@ export default function AppointmentHistory() {
                     className="w-full"
                   >
                     <SelectItem key="dateAsc" value="dateAsc">
-                      Date (Newest First)
+                      Ngày (Mới nhất)
                     </SelectItem>
                     <SelectItem key="dateDesc" value="dateDesc">
-                      Date (Oldest First)
+                      Ngày (Cũ nhất)
                     </SelectItem>
                   </Select>
                 </div>
 
-                {userRole === "Student" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tên chuyên gia tâm lí
-                    </label>
-                    <select
-                      name="psychologistName"
-                      value={filters.psychologistName || ""}
-                      onChange={(e) => {
-                        handleFilterChange("psychologistName", e.target.value);
-                      }}
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
-                      disabled={loadingPsychologists}
-                    >
-                      <option value="">Tất cả chuyên gia tâm lí</option>
-                      {psychologists.map((name) => (
-                        <option key={name} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tên chuyên gia tâm lí
+                  </label>
+                  <Select
+                    name="psychologistName"
+                    value={filters.psychologistName || ""}
+                    onChange={(e) => {
+                      handleFilterChange("psychologistName", e.target.value);
+                    }}
+                    aria-label="Profile Actions"
+                    className="w-full"
+                    disabled={loadingPsychologists}
+                  >
+                    {psychologists.map((name) => (
+                      <SelectItem key={name}>{name}</SelectItem>
+                    ))}
+                  </Select>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 mt-4">
-                <Button color="default" onClick={resetFilters}>
-                  Reset
+                <Button color="default" onPress={resetFilters}>
+                  Đặt lại
                 </Button>
-                <Button color="primary" onClick={applyFilters}>
-                  Apply Filters
+                <Button color="primary" onPress={applyFilters}>
+                  Áp dụng
                 </Button>
               </div>
             </CardBody>
