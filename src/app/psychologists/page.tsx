@@ -16,19 +16,8 @@ import { useRouter } from "next/navigation";
 import MotionHeading from "@/components/MotionHeading";
 import { BiFilterAlt } from "react-icons/bi";
 import FilterButton from "@/components/FilterButton";
-
-type Psychologist = {
-  id: number;
-  fullName: string;
-  bio: string;
-  averageRating: number;
-  sessionPrice: number;
-  specialization: {
-    id: number;
-    name: string;
-  };
-  imageUrl?: string;
-};
+import { Psychologist } from "@/types/psychologist";
+import { FaCalendarAlt } from "react-icons/fa";
 
 type Specialization = {
   id: number;
@@ -308,14 +297,6 @@ const PsychologistPage = () => {
             </CardBody>
           </Card>
         )}
-        {/* <div className="flex w-full flex-wrap">
-          <Input
-            label="🔍Tên chuyên gia‍"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div> */}
 
         {loading && <p className="text-center text-gray-500">Loading...</p>}
 
@@ -360,11 +341,11 @@ const PsychologistPage = () => {
                   <div className="flex flex-col items-end">
                     <div className="mb-2 text-right">
                       <p className="flex font-semibold items-center gap-1">
-                        Rating: {psychologist.averageRating}{" "}
+                        Đánh giá: {psychologist.averageRating}{" "}
                         <FaStar className="text-yellow-300" />
                       </p>
                       <p className="mt-1 font-semibold text-second-color">
-                        Price: {psychologist.sessionPrice.toLocaleString()} VND
+                        Giá: {psychologist.sessionPrice.toLocaleString()} VND
                       </p>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -377,15 +358,16 @@ const PsychologistPage = () => {
                           )
                         }
                       >
-                        View Detail
+                        Xem chi tiết
                       </Button>
                       <Button
-                        className="w-32 text-sm bg-purple-600"
+                        className="w-32 text-sm text-white bg-secondary-blue"
                         onPress={() =>
                           router.push(`/psychologists/${psychologist.id}`)
                         }
                       >
-                        Book Now
+                        <FaCalendarAlt />
+                        Đặt lịch
                       </Button>
                     </div>
                   </div>
