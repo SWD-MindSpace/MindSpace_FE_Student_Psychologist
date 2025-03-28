@@ -12,7 +12,8 @@ import NavBarForPsychologist from "../NavBarForPsychologist";
 import FooterForPsychologist from "../FooterForPsychologist";
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const idToken = localStorage.getItem("idToken");
+  const idToken =
+    typeof window !== "undefined" ? localStorage.getItem("idToken") : null;
   const decodedToken = idToken
     ? JSON.parse(atob(idToken.split(".")[1]))
     : "Student";

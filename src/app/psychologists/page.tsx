@@ -11,7 +11,7 @@ import {
   SelectItem,
   Slider,
 } from "@heroui/react";
-import { FaStar, FaUserDoctor, FaLock } from "react-icons/fa6";
+import { FaStar, FaUserDoctor } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { BiFilterAlt } from "react-icons/bi";
 import FilterButton from "@/components/FilterButton";
@@ -41,16 +41,15 @@ const PsychologistPage = () => {
   const [psychologists, setPsychologists] = useState<Psychologist[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [unauthorized, setUnauthorized] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [filters, setFilters] = useState<PsychologistFilter>({});
   const [activeFilters, setActiveFilters] = useState<PsychologistFilter>({});
+  const [maxSessionPrice, setMaxSessionPrice] = useState(500000);
   const [priceValue, setPriceValue] = useState([100000, 500000]);
   const [ratingValue, setRatingValue] = useState(0);
 
   const images = [
-    "https://res.cloudinary.com/ddewgbug1/image/upload/v1742826548/smt6861krglkqtfisr98.jpg",
     "https://res.cloudinary.com/ddewgbug1/image/upload/v1743185617/hjgjff6ajjys9hwbmryq.jpg",
     "https://res.cloudinary.com/ddewgbug1/image/upload/v1743185766/y9invcdd1q6q8jopuuzr.jpg",
   ];
@@ -60,7 +59,6 @@ const PsychologistPage = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
-        setUnauthorized(true);
         setLoading(false);
         return;
       }
@@ -80,8 +78,9 @@ const PsychologistPage = () => {
         );
       }
 
-      const API_URL = `${process.env.NEXT_PUBLIC_API_URL
-        }/identities/accounts/psychologists?${queryParams.toString()}`;
+      const API_URL = `${
+        process.env.NEXT_PUBLIC_API_URL
+      }/identities/accounts/psychologists?${queryParams.toString()}`;
 
       const response = await fetch(API_URL, {
         headers: {
@@ -92,7 +91,6 @@ const PsychologistPage = () => {
 
       if (response.status === 401) {
         console.log("Unauthorized");
-        setUnauthorized(true);
         return;
       }
 
@@ -122,10 +120,21 @@ const PsychologistPage = () => {
         );
       }
 
+      // Find the largest session price
+      if (filteredData.length > 0) {
+        const largestPrice = Math.max(
+          ...filteredData.map((p: Psychologist) => p.sessionPrice)
+        );
+        // Add 100000 for some buffer and round to nearest 100000
+        const roundedMaxPrice = Math.ceil(largestPrice / 100000) * 100000;
+        setMaxSessionPrice(roundedMaxPrice);
+        // Update priceValue if the current max is less than the largest price
+        setPriceValue((prev) => [prev[0], roundedMaxPrice]);
+      }
+
       setPsychologists(filteredData);
     } catch (err) {
       console.log(err);
-      setUnauthorized(true);
     } finally {
       setLoading(false);
     }
@@ -134,7 +143,6 @@ const PsychologistPage = () => {
   const fetchSpecializations = useCallback(async () => {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
-      setUnauthorized(true);
       setLoading(false);
       return;
     }
@@ -170,7 +178,7 @@ const PsychologistPage = () => {
 
   const resetFilters = () => {
     const defaultFilters: PsychologistFilter = {};
-    setPriceValue([100000, 500000]);
+    setPriceValue([100000, maxSessionPrice]);
     setRatingValue(0);
     setSearchTerm("");
     setFilters(defaultFilters);
@@ -218,7 +226,8 @@ const PsychologistPage = () => {
             Tìm kiếm <span className="text-blue-300">Chuyên gia Tâm lý</span>
           </MotionHeading>
           <MotionHeading className="text-xl mt-2">
-            Hãy kết nối với các chuyên gia hàng đầu để chăm sóc sức khỏe tinh thần của bạn.
+            Hãy kết nối với các chuyên gia hàng đầu để chăm sóc sức khỏe tinh
+            thần của bạn.
           </MotionHeading>
         </div>
       </div>
@@ -273,7 +282,7 @@ const PsychologistPage = () => {
                     value={priceValue}
                     formatOptions={{ style: "currency", currency: "VND" }}
                     label="Giá cuộc hẹn"
-                    maxValue={500000}
+                    maxValue={maxSessionPrice}
                     minValue={100000}
                     step={10000}
                     onChange={(value) => handlePriceChange(value as number[])}
@@ -329,82 +338,68 @@ const PsychologistPage = () => {
 
         {loading && <p className="text-center text-gray-500">Loading...</p>}
 
-        {unauthorized ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded-md flex flex-col items-center">
-            <FaLock className="text-red-500 text-2xl mb-2" />
-            <p className="text-lg font-semibold">
-              You need to log in to view psychologists.
-            </p>
-            <Button
-              className="mt-3 bg-blue-500 text-white px-4 py-2 rounded"
-              onPress={() => router.push("/login")}
+        <div className="flex flex-col gap-4">
+          {psychologists.map((psychologist) => (
+            <div
+              key={psychologist.id}
+              className="bg-seventh-color shadow-md p-4 my-6 rounded-xl hover:scale-105 transition-all"
             >
-              Go to Login
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {psychologists.map((psychologist) => (
-              <div
-                key={psychologist.id}
-                className="bg-seventh-color shadow-md p-4 my-6 rounded-xl hover:scale-105 transition-all"
-              >
-                <div className="grid grid-cols-2">
-                  <div className="flex items-center gap-5">
-                    <Avatar
-                      src={psychologist.imageUrl || "https://randomuser.me/api/portraits/men/1.jpg"}
-                      alt={psychologist.fullName}
-                      className="w-32 h-32 rounded-md object-cover"
-                    />
-                    <div>
-                      <h2 className="text-lg font-semibold flex items-center gap-1">
-                        <FaUserDoctor className="text-primary-blue" />{" "}
-                        {psychologist.fullName}
-                      </h2>
-                      <p className="text-medium">
-                        {psychologist.specialization.name}
-                      </p>
-                    </div>
+              <div className="grid grid-cols-2">
+                <div className="flex items-center gap-5">
+                  <Avatar
+                    src={
+                      psychologist.imageUrl ||
+                      "https://randomuser.me/api/portraits/men/1.jpg"
+                    }
+                    alt={psychologist.fullName}
+                    className="w-32 h-32 rounded-md object-cover"
+                  />
+                  <div>
+                    <h2 className="text-lg font-semibold flex items-center gap-1">
+                      <FaUserDoctor className="text-primary-blue" />{" "}
+                      {psychologist.fullName}
+                    </h2>
+                    <p className="text-medium">
+                      {psychologist.specialization.name}
+                    </p>
                   </div>
+                </div>
 
-                  <div className="flex flex-col items-end">
-                    <div className="mb-2 text-right">
-                      <p className="flex font-semibold items-center gap-1">
-                        Đánh giá: {psychologist.averageRating}{" "}
-                        <FaStar className="text-yellow-300" />
-                      </p>
-                      <p className="mt-1 font-bold">
-                        Giá: {psychologist.sessionPrice.toLocaleString()} VND
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        variant="bordered"
-                        className="w-32 text-sm bg-white"
-                        onPress={() =>
-                          router.push(
-                            `/psychologists/details/${psychologist.id}`
-                          )
-                        }
-                      >
-                        Xem chi tiết
-                      </Button>
-                      <Button
-                        className="w-32 text-sm text-white bg-secondary-blue"
-                        onPress={() =>
-                          router.push(`/psychologists/${psychologist.id}`)
-                        }
-                      >
-                        <FaCalendarAlt />
-                        Đặt lịch
-                      </Button>
-                    </div>
+                <div className="flex flex-col items-end">
+                  <div className="mb-2 text-right">
+                    <p className="flex font-semibold items-center gap-1">
+                      Đánh giá: {psychologist.averageRating}{" "}
+                      <FaStar className="text-yellow-300" />
+                    </p>
+                    <p className="mt-1 font-bold">
+                      Giá: {psychologist.sessionPrice.toLocaleString()} VND
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="bordered"
+                      className="w-32 text-sm bg-white"
+                      onPress={() =>
+                        router.push(`/psychologists/details/${psychologist.id}`)
+                      }
+                    >
+                      Xem chi tiết
+                    </Button>
+                    <Button
+                      className="w-32 text-sm text-white bg-secondary-blue"
+                      onPress={() =>
+                        router.push(`/psychologists/${psychologist.id}`)
+                      }
+                    >
+                      <FaCalendarAlt />
+                      Đặt lịch
+                    </Button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   FaBrain,
   FaHeart,
@@ -22,9 +21,11 @@ import { MdModelTraining } from "react-icons/md";
 import MotionHeading from "@/components/MotionHeading";
 import { Psychologist } from "@/types/psychologist";
 import { useEffect, useState } from "react";
+import LoginReminderModal from "@/components/modals/LoginReminderModal";
 
 export default function Home() {
   const [psychologists, setPsychologists] = useState<Psychologist[]>([]);
+  const [loginReminderModal, setLoginReminderModal] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -43,8 +44,14 @@ export default function Home() {
     };
     fetchPsychologists();
   }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <LoginReminderModal
+        open={loginReminderModal}
+        onClose={() => setLoginReminderModal(false)}
+      />
+
       <section className="relative bg-secondary-blue text-white py-28 text-center font-noto-sans shadow-sm shadow-black">
         {/* Background Video */}
         <video
@@ -70,11 +77,12 @@ export default function Home() {
           <MotionHeading className="text-xl font-noto-sans mt-4" delay={0.5}>
             Hành trình đến với sức khỏe tinh thần của bạn bắt đầu từ đây.
           </MotionHeading>
-          <Link href="/psychologists">
-            <Button className="mt-6 px-8 py-3 text-lg font-semibold shadow-lg transition-transform hover:scale-105">
-              Đặt một cuộc hẹn
-            </Button>
-          </Link>
+          <Button
+            onPress={() => setLoginReminderModal(true)}
+            className="mt-6 px-8 py-3 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
+          >
+            Đặt một cuộc hẹn
+          </Button>
         </div>
       </section>
 

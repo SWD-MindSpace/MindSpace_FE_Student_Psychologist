@@ -17,6 +17,7 @@ import { FiChevronDown, FiMenu, FiX, FiUser, FiVideo } from "react-icons/fi";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import { FaSquarespace } from "react-icons/fa";
 
 export default function NavBarForPsychologist() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function NavBarForPsychologist() {
     <Navbar
       shouldHideOnScroll
       maxWidth="2xl"
-      className="bg-fifth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
+      className="bg-sixth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
     >
       <NavbarBrand className="gap-2">
         <motion.div
@@ -45,7 +46,12 @@ export default function NavBarForPsychologist() {
             },
           }}
         >
-          <div className="text-3xl font-bold font-bevnpro">MindSpace</div>
+          <Link
+            href="/"
+            className="text-2xl font-bold font-bevnpro flex items-center gap-2"
+          >
+            <FaSquarespace size={24} /> MindSpace
+          </Link>
         </motion.div>
       </NavbarBrand>
 
@@ -57,7 +63,7 @@ export default function NavBarForPsychologist() {
       </div>
 
       {/* Desktop Menu */}
-      <NavbarContent className="hidden flex justify-between gap-10">
+      <NavbarContent className="hidden md:flex justify-between items-center gap-10">
         {user && (
           <>
             <NavbarItem>
@@ -175,13 +181,13 @@ export default function NavBarForPsychologist() {
           <div className="flex gap-3">
             <Button
               onPress={() => router.push("/login")}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md"
+              className="bg-black text-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng nhập
             </Button>
             <Button
               onPress={() => router.push("/register")}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md"
+              className="bg-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng ký
             </Button>
@@ -274,13 +280,13 @@ export default function NavBarForPsychologist() {
             <div className="flex flex-col gap-3 mt-4">
               <Button
                 onPress={() => router.push("/login")}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md"
+                className="bg-black text-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
               >
                 Đăng nhập
               </Button>
               <Button
                 onPress={() => router.push("/register")}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md"
+                className="bg-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
               >
                 Đăng ký
               </Button>

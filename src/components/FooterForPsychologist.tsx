@@ -86,7 +86,7 @@ export default function FooterForPsychologist() {
           </div>
         </div>
         <div className="mt-6 text-center text-sm border-t border-gray-300 pt-4">
-          <p>© {new Date().getFullYear()} MindSpace. Đã đăng ký Bản quyền.</p>
+          <p>© {new Date().getFullYear()} MindSpace. All rights reserved.</p>
         </div>
       </div>
     </footer>
