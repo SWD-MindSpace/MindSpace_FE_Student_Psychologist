@@ -22,6 +22,8 @@ export default {
         "third-color": "var(--third-color)",
         "fourth-color": "var(--fourth-color)",
         "fifth-color": "var(--fifth-color)",
+        "sixth-color": "var(--sixth-color)",
+        "seventh-color": "var(--seventh-color)",
       },
       fontFamily: {
         'bevnpro': ['Be Vietnam Pro'], // Big headings
