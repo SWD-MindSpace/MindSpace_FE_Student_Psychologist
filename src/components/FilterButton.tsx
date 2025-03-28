@@ -1,5 +1,4 @@
 import { Button } from "@heroui/react";
-import { useState } from "react";
 import { BiFilterAlt } from "react-icons/bi";
 
 export default function FilterButton({
@@ -17,7 +16,7 @@ export default function FilterButton({
         onClick={() => setShowFilters(!showFilters)}
       >
         <BiFilterAlt />
-        {showFilters ? "Hide Filters" : "Show Filters"}
+        {showFilters ? "Ẩn bộ lọc" : "Hiển thị bộ lọc"}
       </Button>
     </div>
   );
