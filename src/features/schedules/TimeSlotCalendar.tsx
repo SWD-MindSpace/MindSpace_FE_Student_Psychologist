@@ -4,9 +4,14 @@ import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./styles/TimeslotCalendar.module.css";
-import { TimeSlotFromApi, ScheduleResponse, TimeSlotToApi } from "./schemas/ScheduleSchemas";
+import {
+  TimeSlotFromApi,
+  ScheduleResponse,
+  TimeSlotToApi,
+} from "./schemas/ScheduleSchemas";
 import ConfirmAppointmentPopup from "./components/BookingConfirmPopup";
 import { useParams } from "next/navigation";
+import { Button, Tooltip } from "@heroui/react";
 
 const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/psychologist-schedules`;
 const bookingUrl = `${process.env.NEXT_PUBLIC_API_URL}/appointments/booking/confirm`;
@@ -16,7 +21,7 @@ export default function TimeSlotCalendar() {
   const { id } = useParams();
   const psychologistId = Number(id);
 
-  console.log("Raw id from useParams:", id); 
+  console.log("Raw id from useParams:", id);
   console.log("Parsed psychologistId:", psychologistId);
 
   const getDate = (fromDate?: Date): Date => {
@@ -64,7 +69,9 @@ export default function TimeSlotCalendar() {
       // Log the fetch request
       console.log(`Fetching data for date: ${startDateStr}`);
 
-      fetch(`${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}&status=free`) // Put 0 to the constants PsychologistScheduleStatus
+      fetch(
+        `${baseUrl}?psychologistId=${psychologistId}&minDate=${startDateStr}&maxDate=${startDateStr}`
+      ) // Put 0 to the constants PsychologistScheduleStatus
         .then((response) => response.json())
         .then((data: ScheduleResponse) => {
           const allSlots = data.flatMap((item) => item.timeSlots);
@@ -76,14 +83,17 @@ export default function TimeSlotCalendar() {
   }, [selectedDay, psychologistId]);
 
   // Kiểm tra slot book lịch mới (ít nhất 15 phút sau hiện tại, GMT+7)
-  const isTimeValidForScheduling = (dateStr: string, startTime: string): boolean => {
+  const isTimeValidForScheduling = (
+    dateStr: string,
+    startTime: string
+  ): boolean => {
     const now = new Date();
     const minimumScheduleTime = new Date(now.getTime() + 15 * 60 * 1000);
     const [hours, minutes] = startTime.split(":").map(Number);
     const slotTime = new Date(dateStr);
     slotTime.setHours(hours, minutes, 0, 0);
-    // return slotTime >= minimumScheduleTime;
-    return true;
+    return slotTime >= minimumScheduleTime;
+    // return true;
   };
 
   // Tạo danh sách slot từ API và bổ sung các slots 30 phút chuẩn
@@ -161,7 +171,9 @@ export default function TimeSlotCalendar() {
     }
 
     if (!isTimeValidForScheduling(dateStr, slot.startTime)) {
-      alert("Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!");
+      alert(
+        "Bạn chỉ có thể đặt lịch sau ít nhất 15 phút so với thời điểm hiện tại!"
+      );
       return;
     }
 
@@ -194,7 +206,10 @@ export default function TimeSlotCalendar() {
   };
 
   // Trong component TimeSlotCalendar
-  const handleConfirmAppointment = async (data: { slot: TimeSlotToApi | undefined; specializationId: number }) => {
+  const handleConfirmAppointment = async (data: {
+    slot: TimeSlotToApi | undefined;
+    specializationId: number;
+  }) => {
     if (!data.slot) {
       alert("Lỗi: Không có khung giờ nào được chọn");
       return;
@@ -221,11 +236,11 @@ export default function TimeSlotCalendar() {
     // Alert thông tin đặt lịch
     alert(
       "Booking Information:\n\n" +
-      `Date: ${bookingData.date}\n` +
-      `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
-      `Specialization ID: ${bookingData.specializationId}\n` +
-      `Psychologist ID: ${bookingData.psychologistId}\n` +
-      `Slot ID: ${bookingData.scheduleId || "Not available"}`
+        `Date: ${bookingData.date}\n` +
+        `Time: ${bookingData.startTime} - ${bookingData.endTime}\n` +
+        `Specialization ID: ${bookingData.specializationId}\n` +
+        `Psychologist ID: ${bookingData.psychologistId}\n` +
+        `Slot ID: ${bookingData.scheduleId || "Not available"}`
     );
 
     await handleStripePayment(bookingData);
@@ -236,7 +251,8 @@ export default function TimeSlotCalendar() {
   // Hàm xác định class style cho slot dựa trên trạng thái
   const getSlotClassName = (
     slot: { startTime: string; endTime: string; status?: number; id?: number },
-    selectedDay: Date | null
+    selectedDay: Date | null,
+    isOverdue: boolean
   ) => {
     if (!selectedDay) return styles.slotItem;
 
@@ -248,7 +264,7 @@ export default function TimeSlotCalendar() {
       selectedTimeslot.startTime === slot.startTime &&
       selectedTimeslot.endTime === slot.endTime;
 
-    if (slot.status !== undefined && slot.status > 0) {
+    if (slot.status !== undefined && (slot.status > 0 || isOverdue)) {
       return `${styles.slotItem} ${styles.booked}`;
     }
     if (slot.status !== undefined && slot.status == 0) {
@@ -306,15 +322,46 @@ export default function TimeSlotCalendar() {
             <div className={styles.slotsGrid}>
               {generateSlots(selectedDay).map((slot, index) => {
                 const isBooked = slot.status !== undefined && slot.status > 0;
-                return (
-                  <div
+                const isOverdue =
+                  new Date(
+                    `${selectedDay.toISOString().split("T")[0]}T${
+                      slot.startTime
+                    }`
+                  ) < new Date();
+                return isOverdue ? (
+                  <Tooltip
+                    content={"Slot đã quá hạn"}
                     key={index}
-                    onClick={() => !isBooked && handleSlotClick(slot)}
-                    className={getSlotClassName(slot, selectedDay)}
-                    style={{ cursor: isBooked ? "not-allowed" : "pointer" }}
+                    color="primary"
+                  >
+                    <Button
+                      onPress={() => handleSlotClick(slot)}
+                      className={getSlotClassName(slot, selectedDay, isOverdue)}
+                    >
+                      {slot.startTime} - {slot.endTime}
+                    </Button>
+                  </Tooltip>
+                ) : isBooked ? (
+                  <Tooltip
+                    content={"Slot đã được đặt trước"}
+                    key={index}
+                    color="primary"
+                  >
+                    <Button
+                      onPress={() => handleSlotClick(slot)}
+                      className={getSlotClassName(slot, selectedDay, isOverdue)}
+                    >
+                      {slot.startTime} - {slot.endTime}
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    key={index}
+                    onPress={() => handleSlotClick(slot)}
+                    className={getSlotClassName(slot, selectedDay, isOverdue)}
                   >
                     {slot.startTime} - {slot.endTime}
-                  </div>
+                  </Button>
                 );
               })}
             </div>

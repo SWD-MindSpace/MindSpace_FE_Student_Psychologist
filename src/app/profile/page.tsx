@@ -53,26 +53,15 @@ export default function Profile() {
       return;
     }
     if (user) {
-      const decodeToken = (token: string) => {
-        try {
-          const payload = token.split(".")[1];
-          const decoded = JSON.parse(atob(payload));
-          return decoded["role"];
-        } catch (error) {
-          console.error("Failed to decode token:", error);
-          return null;
-        }
-      };
-
-      const userRole = user?.idToken ? decodeToken(user.idToken) : null;
-      setUserRole(userRole);
+      const accessToken = localStorage.getItem("accessToken");
+      setUserRole(user?.role);
 
       const fetchProfile = async () => {
         try {
           const response = await fetch(API_URL, {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${user.accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
           });
@@ -152,7 +141,7 @@ export default function Profile() {
       const response = await fetch(API_URL, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${user.accessToken}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: formData,
       });
