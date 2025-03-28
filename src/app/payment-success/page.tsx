@@ -23,9 +23,10 @@ export default function PaymentPage() {
     // Set session ID and transaction ID
     setSessionId(storedSessionId);
 
+
     // Create SignalR connection
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7096/hub/payment")
+      .withUrl(`${process.env.NEXT_PUBLIC_URL}/hub/payment`)
       .withAutomaticReconnect()
       .build();
 
