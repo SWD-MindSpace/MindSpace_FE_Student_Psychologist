@@ -17,6 +17,7 @@ import { FiChevronDown, FiMenu, FiX, FiUser, FiVideo } from "react-icons/fi";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import { FaSquarespace } from "react-icons/fa";
 
 export default function TopNav() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function TopNav() {
     <Navbar
       shouldHideOnScroll
       maxWidth="2xl"
-      className="bg-fifth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
+      className="bg-sixth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
     >
       <div className="flex justify-between items-center w-full">
         <NavbarBrand className="gap-2">
@@ -46,8 +47,8 @@ export default function TopNav() {
               },
             }}
           >
-            <Link href="/" className="text-3xl font-bold font-bevnpro">
-              MindSpace
+            <Link href="/" className="text-2xl font-bold font-bevnpro flex items-center gap-2">
+              <FaSquarespace size={24} /> MindSpace
             </Link>
           </motion.div>
         </NavbarBrand>
@@ -165,16 +166,16 @@ export default function TopNav() {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-1/2">
             <Button
               onPress={() => router.push("/login")}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md"
+              className="bg-black text-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng nhập
             </Button>
             <Button
               onPress={() => router.push("/register")}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md"
+              className="bg-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng ký
             </Button>

@@ -66,13 +66,13 @@ const PsychologistDetailPage = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto my-4 px-4 py-10">
       <div className="grid grid-cols-2 pb-6">
         <div className="flex items-center gap-6">
           <Avatar
-            src={psychologist?.imageUrl || "/default-avatar.png"}
+            src={psychologist?.imageUrl || "https://randomuser.me/api/portraits/men/1.jpg"}
             alt={psychologist?.fullName}
-            className="w-40 h-40 rounded-md object-cover border-2 border-black"
+            className="w-40 h-40 rounded-full object-cover border-2 border-black"
           />
           <div>
             <h1 className="text-2xl font-semibold flex items-center gap-2">
@@ -108,12 +108,12 @@ const PsychologistDetailPage = () => {
       <Divider className="h-2 bg-black my-6" />
 
       <div className="py-2">
-        <p className="text-xl font-bold">Mô tả</p>
+        <p className="text-2xl font-bold">Mô tả</p>
         <p>{psychologist?.bio}</p>
       </div>
 
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold">Đánh giá</h2>
+      <div className="my-10">
+        <h2 className="text-2xl font-semibold">Đánh giá</h2>
         <div className="mt-4 space-y-4">
           {psychologist?.feedbacks.length ? (
             psychologist.feedbacks.map((feedback, index) => (

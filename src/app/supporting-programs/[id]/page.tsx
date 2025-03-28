@@ -68,9 +68,16 @@ export default function ProgramDetail() {
                     <Spinner size="lg" color="primary" />
                 </div>
             ) : program ? (
-                <div className="max-w-4xl mx-auto p-6">
+                <div className="max-w-4xl mx-auto p-10">
                     <Card className="shadow-lg rounded-lg">
-                        <Image src={program.thumbnailUrl} alt={program.title} className="w-full h-60 object-cover rounded-t-lg" />
+                        <Image
+                            src={program.thumbnailUrl}
+                            fallbackSrc="https://res.cloudinary.com/ddewgbug1/image/upload/v1743173783/azjjre8xhnqdp77q2pdk.jpg"
+                            alt={program.title}
+                            width={'100%'}
+                            height={400}
+                            radius='md'
+                        />
                         <CardBody className="p-6">
                             <div className="mt-3 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-gray-500" />
@@ -86,10 +93,10 @@ export default function ProgramDetail() {
 
                             <div className="flex gap-4 mt-6">
                                 <Button color="primary" variant="bordered" className="w-full" onPress={() => router.push('/supporting-programs')}>
-                                    Back to List
+                                    Quay lại danh sách
                                 </Button>
                                 <Button color="success" className="w-full" onPress={() => registerForProgram(program.id)}>
-                                    Register Program
+                                    Đăng kí chương trình
                                 </Button>
                             </div>
                         </CardBody>

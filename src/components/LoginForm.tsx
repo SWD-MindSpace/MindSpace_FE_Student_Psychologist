@@ -99,8 +99,8 @@ export default function LoginForm() {
         }}
       ></div>
 
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gray-100 p-8">
-        <MotionHeading className="text-sky-600 mb-6">MindSpace</MotionHeading>
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center bg-gradient-to-br from-sky-300 to-sixth-color p-8">
+        <MotionHeading className="text-sky-600 mb-6">Welcome to MindSpace</MotionHeading>
 
         <Card className="w-[400px] p-8 rounded-xl shadow-lg bg-white">
           <CardHeader className="text-2xl font-bold text-center text-gray-800">

@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader, Button, Spinner, Divider, CardFooter, Image
 import { Toaster, toast } from "react-hot-toast";
 import MotionHeading from "@/components/MotionHeading";
 import { useAuth } from "@/context/AuthContext";
+import { LuNotebookPen } from "react-icons/lu";
 
 type Test = {
   id: number;
@@ -154,7 +155,7 @@ export default function AllTests() {
           {/* Psychological Tests */}
           {psychologicalTests.length > 0 && (
             <>
-              <MotionHeading className="text-center mb-6">Psychological Tests</MotionHeading>
+              <MotionHeading className="text-center mb-6 flex items-center justify-center gap-2"><LuNotebookPen /> Các bài kiểm tra tâm lí</MotionHeading>
               <div className="grid md:grid-cols-3 gap-6 font-noto-sans">
                 {psychologicalTests.map((test) => (
                   <Card key={test.id} className="bg-white shadow-md hover:scale-105 transition-transform">
@@ -171,7 +172,7 @@ export default function AllTests() {
                         className="mt-3 w-fit p-5 bg-second-color"
                         onPress={() => handleStartTest(test.id)}
                       >
-                        Take Test
+                        Làm bài test
                       </Button>
                     </CardFooter>
                   </Card>
@@ -185,12 +186,12 @@ export default function AllTests() {
             <>
               <Divider className="my-10 w-1/2 mx-auto" />
               <MotionHeading className="text-center mb-6">Periodic Tests</MotionHeading>
-              <div className="grid gap-6">
+              <div className="grid grid-cols-2 gap-6">
                 {periodicTests.map((test) => (
                   <Card key={test.id} className="p-6 bg-yellow-50 shadow-md hover:shadow-lg transition duration-300">
                     <CardHeader className="text-xl font-bold">{test.title}</CardHeader>
                     <CardBody>
-                      <p className="text-black text-lg">{test.testCode}</p>
+                      <p className="text-black text-lg font-semibold">{test.testCode}</p>
                       <p className="text-gray-600 text-lg">{test.description}</p>
                       <Button
                         color="success"
