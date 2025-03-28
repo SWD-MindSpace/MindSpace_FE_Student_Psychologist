@@ -135,7 +135,7 @@ export default function TopNav() {
           <Dropdown>
             <DropdownTrigger>
               <Button variant="light" className="flex items-center gap-2">
-                <FiUser size={18} /> Your account <FiChevronDown size={16} />
+                <FiUser size={18} /> Tài khoản <FiChevronDown size={16} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu>
@@ -146,13 +146,6 @@ export default function TopNav() {
                 <DropdownItem key="history-program">
                   <Link href="/supporting-programs/programs-history">
                     Lịch sử đăng kí
-                  </Link>
-                </DropdownItem>
-              ) : null}
-              {userRole === "Psychologist" ? (
-                <DropdownItem key="schedules">
-                  <Link href="/schedules">
-                    Quản lý lịch làm việc
                   </Link>
                 </DropdownItem>
               ) : null}
@@ -218,7 +211,7 @@ export default function TopNav() {
                   variant="light"
                   className="flex items-center gap-2 self-center"
                 >
-                  <FiUser size={18} /> Your Account <FiChevronDown size={16} />
+                  <FiUser size={18} /> Tài khoản <FiChevronDown size={16} />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
