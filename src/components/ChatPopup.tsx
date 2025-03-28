@@ -7,7 +7,6 @@ import { FaComments, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 
 export default function ChatPopup() {
-
   // ================================
   // == Variables
   // ================================
@@ -24,7 +23,7 @@ export default function ChatPopup() {
   // == Use Effects
   // ================================
 
-  // 
+  //
   useEffect(() => {
     // Get user role from localStorage
     const role = localStorage.getItem("userRole");
@@ -120,7 +119,17 @@ export default function ChatPopup() {
                   <p className="text-sm font-semibold mb-1 transition-all duration-300 hover:scale-105">
                     {msg.userName}
                   </p>
-                  <p className="text-sm transition-all duration-300 hover:text-opacity-90">{msg.message}</p>
+
+                  {/* Message */}
+                  <div className="text-sm transition-all duration-300 hover:text-opacity-90 whitespace-pre-line">
+                    {msg.message.split('\\r\\n').map((line, i) => (
+                      <p key={i} className="mb-2 last:mb-0">
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Time  */}
                   {msg.timestamp && (
                     <p
                       className={`text-xs mt-1 transition-all duration-300 ${msg.userName === "You"

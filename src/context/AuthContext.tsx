@@ -3,29 +3,36 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface User {
+    id: string;
+    role: string;
+    studentId?: string;
+}
+
 interface AuthContextType {
-    user: { idToken: string; accessToken: string } | null;
+    user: User | null;
     loading: boolean;
-    login: (tokens: { id_token: string; access_token: string }) => void;
+    login: (data: { id_token: string; access_token: string; user: User }) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<{ idToken: string; accessToken: string } | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true); // Add loading state
     const router = useRouter();
 
     useEffect(() => {
-        const idToken = localStorage.getItem('idToken');
-        const accessToken = localStorage.getItem('accessToken');
+        // Check for stored user information on mount
+        const storedUser = {
+            id: localStorage.getItem("userId") || "",
+            role: localStorage.getItem("userRole") || "",
+            studentId: localStorage.getItem("studentId") || undefined,
+        };
 
-        if (idToken && accessToken && !isTokenExpired(idToken)) {
-            setUser({ idToken, accessToken });
-        } else {
-            localStorage.removeItem('idToken');
-            localStorage.removeItem('accessToken');
+        if (storedUser.id && storedUser.role) {
+            setUser(storedUser);
         }
 
         setLoading(false); // Done loading after checking tokens
@@ -52,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userId');
         localStorage.removeItem('userRole');
+        localStorage.removeItem('studentId');
         setUser(null);
         router.push('/');
     }, [router]);
@@ -66,10 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const login = ({ id_token, access_token }: { id_token: string; access_token: string }) => {
+    const login = (data: { id_token: string; access_token: string; user: User }) => {
         try {
             // Decode access token
-            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            const payload = JSON.parse(atob(data.access_token.split('.')[1]));
 
             const userId = payload.sub; // Extract user ID
             const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]; // Fix role extraction
@@ -77,12 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!userId || !userRole) throw new Error("User ID or Role not found in token");
 
             // Store tokens and user details
-            localStorage.setItem('idToken', id_token);
-            localStorage.setItem('accessToken', access_token);
+            localStorage.setItem('idToken', data.id_token);
+            localStorage.setItem('accessToken', data.access_token);
             localStorage.setItem('userId', userId);
             localStorage.setItem('userRole', userRole); // Store role separately
+            localStorage.setItem('studentId', data.user.studentId);
 
-            setUser({ idToken: id_token, accessToken: access_token });
+            setUser(data.user);
             router.push('/');
         } catch (error) {
             console.error('Error decoding access token:', error);
