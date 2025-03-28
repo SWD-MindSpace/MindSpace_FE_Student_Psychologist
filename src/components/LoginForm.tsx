@@ -44,10 +44,45 @@ export default function LoginForm() {
       if (!id_token || !access_token)
         throw new Error("Missing tokens in response");
 
+      // Store tokens in localStorage
+      localStorage.setItem("idToken", id_token);
+      localStorage.setItem("accessToken", access_token);
+
+      // Fetch user information
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identities/profile`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!userResponse.ok) {
+        throw new Error("Failed to fetch user information");
+      }
+
+      const userData = await userResponse.json();
+
+      // Store user information
+      localStorage.setItem("userRole", userData.role);
+      localStorage.setItem("userId", userData.id);
+      if (userData.role === "Student") {
+        localStorage.setItem("studentId", userData.studentId);
+      }
+
+      // Update auth context with user information
+      login({
+        id_token,
+        access_token,
+        user: {
+          id: userData.id,
+          role: userData.role,
+          studentId: userData.id,
+        }
+      });
+
       console.log("ID Token:", id_token);
       console.log("Access Token:", access_token);
 
-      login({ id_token, access_token });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || "Something went wrong");
