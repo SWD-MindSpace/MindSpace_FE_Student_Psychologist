@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Spinner, Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import { useAuth } from "@/context/AuthContext";
+import { toast, Toaster } from "react-hot-toast";
 
 interface TestScoreRank {
   minScore: number;
@@ -58,7 +59,6 @@ export default function TestPage() {
   const [studentId, setStudentId] = useState<number | null>(null);
   const [parentId, setParentId] = useState<number | null>(null);
 
-  // Extract studentId or parentId from JWT token
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
@@ -91,13 +91,7 @@ export default function TestPage() {
     }
   }, [router]);
 
-  // Fetch test details
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
-      router.push("/login");
-      return;
-    }
     const fetchTest = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tests/${id}`, {
@@ -119,7 +113,6 @@ export default function TestPage() {
     fetchTest();
   }, [id, router]);
 
-  // Handle answer selection
   const handleSelect = (questionId: number, option: TestOption) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -127,26 +120,22 @@ export default function TestPage() {
     }));
   };
 
-  // Handle test submission
   const handleSubmit = async () => {
     if (!test || (!studentId && !parentId)) {
-      alert("Vui lòng đăng nhập để hoàn thành bài kiểm tra");
+      toast.error("Vui lòng đăng nhập để hoàn thành bài kiểm tra");
       return;
     }
 
-    // Check if all questions are answered
     if (Object.keys(answers).length !== test.questions.length) {
-      alert("Vui lòng trả lời tất cả các câu hỏi");
+      toast.error("Vui lòng trả lời tất cả các câu hỏi");
       return;
     }
 
-    // Calculate total score
     const totalScore = Object.values(answers).reduce((sum, option) => sum + (option.score || 0), 0);
     const result =
       test.testScoreRanks.find((rank) => totalScore >= rank.minScore && totalScore <= rank.maxScore)?.result ||
       undefined;
 
-    // Create testResponseItems from answers
     const testResponseItems: TestResponseItem[] = Object.entries(answers).map(([questionId, option]) => {
       const question = test.questions.find((q) => q.id === Number(questionId));
       return {
@@ -156,7 +145,6 @@ export default function TestPage() {
       };
     });
 
-    // Create testResponse payload
     const testResponse: TestResponse = {
       totalScore,
       testScoreRankResult: result,
@@ -191,14 +179,16 @@ export default function TestPage() {
       const testResponseId = locationUrl.split("/").pop();
       if (!testResponseId) throw new Error("Invalid response location");
 
-      // Show success message before redirecting
-      alert(result ? `Kết quả của bạn: ${result}` : "Đã hoàn thành bài khảo sát");
+      toast.success(result ? `Kết quả của bạn: ${result}` : "Đã hoàn thành bài khảo sát", {
+        duration: 3000,
+      });
 
-      // Redirect to results page
-      router.push(`/test-responses/${testResponseId}`);
+      setTimeout(() => {
+        router.push(`/test-responses/${testResponseId}`);
+      }, 1000);
     } catch (error) {
       console.error("Error saving test response:", error);
-      alert("Có lỗi khi lưu kết quả bài kiểm tra. Vui lòng thử lại.");
+      toast.error("Có lỗi khi lưu kết quả bài kiểm tra. Vui lòng thử lại.");
     }
   };
 
@@ -212,20 +202,21 @@ export default function TestPage() {
 
   return (
     <div className="min-h-screen px-4 py-6 bg-gray-50">
-      <Card className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-4">
+      <Toaster />
+      <Card className="max-w-2xl mx-auto bg-seventh-color shadow-md rounded-lg p-4">
         <CardHeader className="flex justify-center text-xl font-semibold text-blue-700">{test.title}</CardHeader>
-        <CardBody className="text-gray-700 text-sm">
-          <p className="text-gray-600 text-center mb-4">{test.description}</p>
-          <Divider className="my-3" />
+        <CardBody className="text-sm">
+          <p className="text-black text-center mb-4">{test.description}</p>
+          <Divider className="my-3 h-1" />
           {test.questions.map((question) => (
-            <div key={question.id} className="mb-3 p-3 bg-gray-100 rounded-md shadow-sm">
+            <div key={question.id} className="mb-8 p-4 bg-gray-100 rounded-md shadow-sm">
               <p className="text-sm font-medium">{question.content}</p>
               <div className="mt-2 grid gap-3">
                 {(test.psychologyTestOptions.length > 0 ? test.psychologyTestOptions : question.questionOptions).map(
                   (option) => (
                     <Button
                       key={option.id}
-                      color={answers[question.id]?.id === option.id ? "primary" : "default"}
+                      color={answers[question.id]?.id === option.id ? "secondary" : "default"}
                       variant="flat"
                       className="w-full text-xs py-2"
                       onPress={() => handleSelect(question.id, option)}
@@ -237,15 +228,11 @@ export default function TestPage() {
               </div>
             </div>
           ))}
-          <Button
-            color="success"
-            variant="bordered"
-            className="mt-4 w-full p-3 text-sm font-semibold"
-            onPress={handleSubmit}
-            disabled={!studentId && !parentId} // Ensure either student or parent is set
-          >
-            Hoàn thành bài kiểm tra
-          </Button>
+          <div className="flex justify-center mt-4">
+            <Button variant="solid" className="w-full max-w-xs p-3 text-sm font-semibold bg-green-500" onPress={handleSubmit}>
+              Hoàn thành bài kiểm tra
+            </Button>
+          </div>
         </CardBody>
       </Card>
     </div>

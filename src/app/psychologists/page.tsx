@@ -13,11 +13,15 @@ import {
 } from "@heroui/react";
 import { FaStar, FaUserDoctor, FaLock } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import MotionHeading from "@/components/MotionHeading";
 import { BiFilterAlt } from "react-icons/bi";
 import FilterButton from "@/components/FilterButton";
 import { Psychologist } from "@/types/psychologist";
 import { FaCalendarAlt } from "react-icons/fa";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import MotionHeading from "@/components/MotionHeading";
 
 type Specialization = {
   id: number;
@@ -45,6 +49,12 @@ const PsychologistPage = () => {
   const [priceValue, setPriceValue] = useState([100000, 500000]);
   const [ratingValue, setRatingValue] = useState(0);
 
+  const images = [
+    "https://res.cloudinary.com/ddewgbug1/image/upload/v1742826548/smt6861krglkqtfisr98.jpg",
+    "https://res.cloudinary.com/ddewgbug1/image/upload/v1743185617/hjgjff6ajjys9hwbmryq.jpg",
+    "https://res.cloudinary.com/ddewgbug1/image/upload/v1743185766/y9invcdd1q6q8jopuuzr.jpg",
+  ];
+
   const fetchPsychologists = useCallback(async () => {
     setLoading(true);
     try {
@@ -70,9 +80,8 @@ const PsychologistPage = () => {
         );
       }
 
-      const API_URL = `${
-        process.env.NEXT_PUBLIC_API_URL
-      }/identities/accounts/psychologists?${queryParams.toString()}`;
+      const API_URL = `${process.env.NEXT_PUBLIC_API_URL
+        }/identities/accounts/psychologists?${queryParams.toString()}`;
 
       const response = await fetch(API_URL, {
         headers: {
@@ -184,16 +193,36 @@ const PsychologistPage = () => {
 
   return (
     <>
-      <div
-        className="relative bg-cover bg-center text-white py-16 px-6"
-        style={{
-          backgroundImage: `url('https://res.cloudinary.com/ddewgbug1/image/upload/v1742826548/smt6861krglkqtfisr98.jpg')`,
-        }}
-      >
-        <MotionHeading className="text-white font-noto-sans mt-5 text-center">
-          Các chuyên gia tâm lí
-        </MotionHeading>
+      <div className="relative w-full h-[350px]">
+        <Swiper
+          spaceBetween={0}
+          slidesPerView={1}
+          loop={true}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          modules={[Autoplay, Navigation]}
+          className="w-full h-full"
+        >
+          {images.map((src, index) => (
+            <SwiperSlide key={index}>
+              <div
+                className="absolute inset-0 w-full h-full bg-cover bg-center bg-opacity-100"
+                style={{ backgroundImage: `url('${src}')` }}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 z-50 font-bevnpro">
+          <MotionHeading className="text-4xl font-semibold tracking-wide">
+            Tìm kiếm <span className="text-blue-300">Chuyên gia Tâm lý</span>
+          </MotionHeading>
+          <MotionHeading className="text-xl mt-2">
+            Hãy kết nối với các chuyên gia hàng đầu để chăm sóc sức khỏe tinh thần của bạn.
+          </MotionHeading>
+        </div>
       </div>
+
       <div className="max-w-4xl mx-auto px-4 py-6">
         <FilterButton
           showFilters={showFilters}
@@ -318,14 +347,14 @@ const PsychologistPage = () => {
             {psychologists.map((psychologist) => (
               <div
                 key={psychologist.id}
-                className="bg-fifth-color shadow-2xl p-4 my-6 border-2 border-black rounded-xl"
+                className="bg-seventh-color shadow-md p-4 my-6 rounded-xl hover:scale-105 transition-all"
               >
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-4 flex-1">
+                <div className="grid grid-cols-2">
+                  <div className="flex items-center gap-5">
                     <Avatar
-                      src={psychologist.imageUrl || "/default-avatar.png"}
+                      src={psychologist.imageUrl || "https://randomuser.me/api/portraits/men/1.jpg"}
                       alt={psychologist.fullName}
-                      className="w-32 h-32 rounded-md object-cover border-2 border-blue-500"
+                      className="w-32 h-32 rounded-md object-cover"
                     />
                     <div>
                       <h2 className="text-lg font-semibold flex items-center gap-1">
@@ -344,7 +373,7 @@ const PsychologistPage = () => {
                         Đánh giá: {psychologist.averageRating}{" "}
                         <FaStar className="text-yellow-300" />
                       </p>
-                      <p className="mt-1 font-semibold text-second-color">
+                      <p className="mt-1 font-bold">
                         Giá: {psychologist.sessionPrice.toLocaleString()} VND
                       </p>
                     </div>
