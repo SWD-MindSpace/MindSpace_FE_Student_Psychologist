@@ -55,7 +55,7 @@ export default function SupportingPrograms() {
 
       try {
         const programsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100`,
+          `${process.env.NEXT_PUBLIC_API_URL}/supporting-programs?pageIndex=1&pageSize=1000&MinQuantity=10&MaxQuantity=100&IsActive=true`,
           {
             method: "GET",
             headers: {
@@ -153,7 +153,7 @@ export default function SupportingPrograms() {
           </MotionHeading>
         </div>
 
-        <div className="w-1/2] flex justify-end">
+        <div className="w-1/2 flex justify-end">
           <MotionHeading>
             <Image
               src="https://res.cloudinary.com/ddewgbug1/image/upload/v1741982520/trnwnxefanvohfwdhapz.avif"
@@ -188,8 +188,10 @@ export default function SupportingPrograms() {
                   >
                     <Image
                       src={program.thumbnailUrl}
+                      fallbackSrc="https://res.cloudinary.com/ddewgbug1/image/upload/v1743173783/azjjre8xhnqdp77q2pdk.jpg"
                       alt={program.city}
-                      className="w-full h-40 object-cover rounded-md"
+                      width={800}
+                      height={400}
                     />
                     <div className="flex justify-between items-end mt-3">
                       <div>
@@ -226,7 +228,7 @@ export default function SupportingPrograms() {
                             router.push(`/supporting-programs/${program.id}`)
                           }
                         >
-                          View Details
+                          Xem chi tiết
                         </Button>
                         {localStorage.getItem("accessToken") && (
                           <Button
@@ -235,7 +237,7 @@ export default function SupportingPrograms() {
                             className="px-4 py-2 text-sm rounded-full shadow-md hover:shadow-lg transition"
                             onPress={() => handleRegister(program.id)}
                           >
-                            Register
+                            Đăng kí
                           </Button>
                         )}
                       </div>

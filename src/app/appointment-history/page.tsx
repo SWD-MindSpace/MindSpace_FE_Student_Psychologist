@@ -8,12 +8,12 @@ import {
   Divider,
   Button,
   Spinner,
-  Input,
   Select,
   SelectItem,
   Pagination,
+  Input,
 } from "@heroui/react";
-import { BiTime, BiVideo, BiFilterAlt } from "react-icons/bi";
+import { BiTime, BiVideo } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
 import MotionHeading from "@/components/MotionHeading";
 import { toast } from "react-hot-toast";
@@ -21,8 +21,11 @@ import Link from "next/link";
 import { Appointment } from "@/types/appointment";
 import { AppointmentFilter } from "@/types/filters";
 import { PaginatedResponse } from "@/types/paginatedResponse";
+import FilterButton from "@/components/FilterButton";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AppointmentHistory() {
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +49,17 @@ export default function AppointmentHistory() {
   }, [activeFilters]);
 
   useEffect(() => {
-    fetchPsychologists();
-  }, []);
+    if (user?.role === "student") {
+      fetchPsychologists();
+    }
+  }, [user]);
 
   const fetchPsychologists = async () => {
     setLoadingPsychologists(true);
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists`,
+        `${process.env.NEXT_PUBLIC_API_URL}/identities/accounts/psychologists/names`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -83,6 +88,13 @@ export default function AppointmentHistory() {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
+      // Get user role from token and determine API endpoint
+      const accessToken = localStorage.getItem("accessToken");
+      const endpoint =
+        user?.role === "student"
+          ? "/appointments/user"
+          : "/appointments/psychologist";
+
       // Construct query params
       const queryParams = new URLSearchParams();
 
@@ -110,11 +122,10 @@ export default function AppointmentHistory() {
         queryParams.append("psychologistName", activeFilters.psychologistName);
       }
 
-      const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
         `${
           process.env.NEXT_PUBLIC_API_URL
-        }/appointments/user?${queryParams.toString()}`,
+        }${endpoint}?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
@@ -128,6 +139,7 @@ export default function AppointmentHistory() {
       }
 
       const data: PaginatedResponse<Appointment> = await response.json();
+      console.log(data);
       setAppointments(data.data);
       setTotalCount(data.count);
     } catch (err) {
@@ -145,9 +157,7 @@ export default function AppointmentHistory() {
     key: keyof AppointmentFilter,
     value: string | number | undefined
   ) => {
-    // Validate dates when either start date or end date changes
     if (key === "startDate" && filters.endDate && value) {
-      // If start date is after end date, don't update
       if (new Date(value.toString()) > new Date(filters.endDate)) {
         toast.error("Start date cannot be after end date");
         return;
@@ -155,7 +165,6 @@ export default function AppointmentHistory() {
     }
 
     if (key === "endDate" && filters.startDate && value) {
-      // If end date is before start date, don't update
       if (new Date(value.toString()) < new Date(filters.startDate)) {
         toast.error("End date cannot be before start date");
         return;
@@ -189,10 +198,9 @@ export default function AppointmentHistory() {
     setActiveFilters(newFilters);
   };
 
-  // Format date to a more readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("vi-VN", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -200,7 +208,6 @@ export default function AppointmentHistory() {
     });
   };
 
-  // Format time to a more readable format
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(":");
     const hour = parseInt(hours, 10);
@@ -209,69 +216,53 @@ export default function AppointmentHistory() {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
-  // Calculate total pages for pagination
   const totalPages = Math.ceil(totalCount / (activeFilters.pageSize || 5));
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <MotionHeading className="mb-2">Appointment History</MotionHeading>
-          <p className="text-gray-600">
-            View your past and upcoming appointments
-          </p>
+          <MotionHeading className="mb-2">Lịch sử cuộc hẹn</MotionHeading>
+          <p className="text-gray-600">Xem lịch sử cuộc hẹn của bạn</p>
         </div>
 
-        <div className="mb-6">
-          <Button
-            color="default"
-            className="flex items-center gap-2"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <BiFilterAlt />
-            {showFilters ? "Hide Filters" : "Show Filters"}
-          </Button>
-        </div>
+        <FilterButton
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
 
         {showFilters && (
           <Card className="mb-8 shadow-md">
             <CardBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
-                  </label>
-                  <Input
-                    type="date"
-                    value={filters.startDate || ""}
-                    onChange={(e) =>
-                      handleFilterChange("startDate", e.target.value)
-                    }
-                    className="w-full"
-                    max={filters.endDate || undefined}
-                  />
+                  <div className="flex flex-row gap-2">
+                    <Input
+                      label="Tìm lịch hẹn bắt đầu từ"
+                      type="date"
+                      value={filters.startDate || ""}
+                      onChange={(e) =>
+                        handleFilterChange("startDate", e.target.value)
+                      }
+                      className="w-full"
+                      max={filters.endDate || undefined}
+                    />
+                    <Input
+                      label="Đến"
+                      type="date"
+                      value={filters.endDate || ""}
+                      onChange={(e) =>
+                        handleFilterChange("endDate", e.target.value)
+                      }
+                      className="w-full"
+                      min={filters.startDate || undefined}
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date
-                  </label>
-                  <Input
-                    type="date"
-                    value={filters.endDate || ""}
-                    onChange={(e) =>
-                      handleFilterChange("endDate", e.target.value)
-                    }
-                    className="w-full"
-                    min={filters.startDate || undefined}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sort By
-                  </label>
                   <Select
+                    label="Sắp xếp theo"
                     name="sort"
                     value={filters.sort || "dateDesc"}
                     onChange={(e) => {
@@ -281,43 +272,41 @@ export default function AppointmentHistory() {
                     className="w-full"
                   >
                     <SelectItem key="dateAsc" value="dateAsc">
-                      Date (Newest First)
+                      Ngày (Mới nhất)
                     </SelectItem>
                     <SelectItem key="dateDesc" value="dateDesc">
-                      Date (Oldest First)
+                      Ngày (Cũ nhất)
                     </SelectItem>
                   </Select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tên chuyên gia tâm lí
-                  </label>
-                  <select
-                    name="psychologistName"
-                    value={filters.psychologistName || ""}
-                    onChange={(e) => {
-                      handleFilterChange("psychologistName", e.target.value);
-                    }}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-2 px-3"
-                    disabled={loadingPsychologists}
-                  >
-                    <option value="">Tất cả chuyên gia tâm lí</option>
-                    {psychologists.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {user?.role === "student" && (
+                  <div>
+                    <Select
+                      label="Tên chuyên gia tâm lí"
+                      name="psychologistName"
+                      value={filters.psychologistName || ""}
+                      onChange={(e) => {
+                        handleFilterChange("psychologistName", e.target.value);
+                      }}
+                      aria-label="Profile Actions"
+                      className="w-full"
+                      disabled={loadingPsychologists}
+                    >
+                      {psychologists.map((name) => (
+                        <SelectItem key={name}>{name}</SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 mt-4">
-                <Button color="default" onClick={resetFilters}>
-                  Reset
+                <Button color="default" onPress={resetFilters}>
+                  Đặt lại
                 </Button>
-                <Button color="primary" onClick={applyFilters}>
-                  Apply Filters
+                <Button color="primary" onPress={applyFilters}>
+                  Áp dụng
                 </Button>
               </div>
             </CardBody>
@@ -356,7 +345,7 @@ export default function AppointmentHistory() {
                       <div className="flex flex-col sm:flex-row justify-between gap-4">
                         <div className="flex items-center text-gray-700">
                           <BiTime className="mr-2 text-xl" />
-                          <span className="font-medium">Time:</span>
+                          <span className="font-medium">Thời gian:</span>
                           <span className="ml-2">
                             {formatTime(appointment.startTime)} -{" "}
                             {formatTime(appointment.endTime)}
@@ -365,30 +354,44 @@ export default function AppointmentHistory() {
 
                         <div className="flex items-center text-gray-700">
                           <FaUser className="mr-2" />
-                          <span className="font-medium">Psychologist:</span>
+                          <span className="font-medium">
+                            {appointment.psychologistName
+                              ? "Chuyên gia tâm lí:"
+                              : "Học sinh:"}
+                          </span>
                           <span className="ml-2">
-                            {appointment.psychologistName}
+                            {appointment.psychologistName ||
+                              appointment.studentName}
                           </span>
                         </div>
                       </div>
 
                       <Divider />
-
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex items-center text-gray-700">
-                          <span className="font-medium">Status:</span>
+                          <span className="font-medium">Trạng thái:</span>
                           {appointment.isUpcoming ? (
                             <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                              Upcoming
+                              Sắp diễn ra
                             </span>
                           ) : (
                             <span className="ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
-                              Past
+                              Đã diễn ra
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/appointment-history/${appointment.id}/appointment-notes`}
+                          >
+                            <Button
+                              className="flex items-center"
+                              color="default"
+                            >
+                              Ghi chú cuộc hẹn
+                            </Button>
+                          </Link>
                           {appointment.meetUrl ? (
                             <Link
                               href={appointment.meetUrl}
@@ -401,7 +404,7 @@ export default function AppointmentHistory() {
                                 disabled={!appointment.isUpcoming}
                               >
                                 <BiVideo className="mr-2" />
-                                Join Meeting
+                                Tham gia cuộc hẹn
                               </Button>
                             </Link>
                           ) : (
@@ -411,7 +414,7 @@ export default function AppointmentHistory() {
                               disabled
                             >
                               <BiVideo className="mr-2" />
-                              No Meeting Link
+                              Không có liên kết cuộc hẹn
                             </Button>
                           )}
                         </div>

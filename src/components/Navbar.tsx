@@ -17,6 +17,7 @@ import { FiChevronDown, FiMenu, FiX, FiUser, FiVideo } from "react-icons/fi";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import { FaSquarespace } from "react-icons/fa";
 
 export default function TopNav() {
   const router = useRouter();
@@ -32,49 +33,52 @@ export default function TopNav() {
     <Navbar
       shouldHideOnScroll
       maxWidth="2xl"
-      className="bg-fifth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
+      className="bg-sixth-color h-24 px-4 shadow-md md:px-4 font-noto-sans"
     >
-      <div className="flex justify-between items-center w-full">
-        <NavbarBrand className="gap-2">
-          <motion.div
-            whileHover={{
-              y: [-4, 4, -4, 0],
-              transition: {
-                duration: 1,
-                repeat: Infinity,
-                repeatType: "reverse",
-              },
-            }}
+      <NavbarBrand className="gap-2">
+        <motion.div
+          whileHover={{
+            y: [-4, 4, -4, 0],
+            transition: {
+              duration: 1,
+              repeat: Infinity,
+              repeatType: "reverse",
+            },
+          }}
+        >
+          <Link
+            href="/"
+            className="text-2xl font-bold font-bevnpro flex items-center gap-2"
           >
-            <Link href="/" className="text-3xl font-bold font-bevnpro">
-              MindSpace
-            </Link>
-          </motion.div>
-        </NavbarBrand>
+            <FaSquarespace size={24} /> MindSpace
+          </Link>
+        </motion.div>
+      </NavbarBrand>
 
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden">
-          <Button variant="light" onPress={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-          </Button>
-        </div>
+      {/* Mobile Menu Toggle */}
+      <div className="md:hidden">
+        <Button variant="light" onPress={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+        </Button>
       </div>
 
       {/* Desktop Menu */}
       <NavbarContent className="hidden md:flex gap-10">
-        <Dropdown>
-          <DropdownTrigger>
-            <Button variant="light">Cuộc hẹn</Button>
-          </DropdownTrigger>
-          <DropdownMenu>
-            <DropdownItem key="book-appointment">
-              <Link href="#">Đặt cuộc hẹn</Link>
-            </DropdownItem>
-            <DropdownItem key="appointment-history">
-              <Link href="/appointment-history">Lịch sử cuộc hẹn</Link>
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        {user && (
+          <Dropdown>
+            <DropdownTrigger>
+              <Button variant="light">Cuộc hẹn</Button>
+            </DropdownTrigger>
+            <DropdownMenu>
+              <DropdownItem key="book-appointment">
+                <Link href="/psychologists">Đặt cuộc hẹn</Link>
+              </DropdownItem>
+              <DropdownItem key="appointment-history">
+                <Link href="/appointment-history">Lịch sử cuộc hẹn</Link>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        )}
         <NavbarItem>
           <Link
             href="/supporting-programs"
@@ -83,14 +87,16 @@ export default function TopNav() {
             Chương trình hỗ trợ
           </Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link
-            href="/alltests"
-            className="hover:text-secondary-blue transition-all"
-          >
-            Bài kiểm tra
-          </Link>
-        </NavbarItem>
+        {user && (
+          <NavbarItem>
+            <Link
+              href="/alltests"
+              className="hover:text-secondary-blue transition-all"
+            >
+              Bài kiểm tra
+            </Link>
+          </NavbarItem>
+        )}
         <NavbarItem>
           <Link
             href="/resources"
@@ -99,14 +105,16 @@ export default function TopNav() {
             Tài nguyên
           </Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link
-            href="/psychologists"
-            className="hover:text-secondary-blue transition-all"
-          >
-            Chuyên gia tâm lí
-          </Link>
-        </NavbarItem>
+        {user && (
+          <NavbarItem>
+            <Link
+              href="/psychologists"
+              className="hover:text-secondary-blue transition-all"
+            >
+              Chuyên gia tâm lí
+            </Link>
+          </NavbarItem>
+        )}
         <NavbarItem>
           <Link
             href="/about-us"
@@ -129,17 +137,23 @@ export default function TopNav() {
       </NavbarContent>
 
       {/* User Actions (Desktop) */}
-      <NavbarContent className="hidden md:flex font-bold pl-20 items-center gap-4">
+      <NavbarContent
+        justify="end"
+        className="hidden md:flex font-bold pl-20 items-center gap-4"
+      >
         {user ? (
           <Dropdown>
             <DropdownTrigger>
               <Button variant="light" className="flex items-center gap-2">
-                <FiUser size={18} /> Your account <FiChevronDown size={16} />
+                <FiUser size={18} /> Tài khoản <FiChevronDown size={16} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu>
               <DropdownItem key="profile">
                 <Link href="/profile">Hồ sơ</Link>
+              </DropdownItem>
+              <DropdownItem key="profile-invoice">
+                <Link href="/profile/invoice">Lịch sử giao dịch</Link>
               </DropdownItem>
               {userRole !== "Parent" ? (
                 <DropdownItem key="history-program">
@@ -158,16 +172,16 @@ export default function TopNav() {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-1/2">
             <Button
               onPress={() => router.push("/login")}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-md"
+              className="bg-black text-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng nhập
             </Button>
             <Button
               onPress={() => router.push("/register")}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-md"
+              className="bg-white px-4 py-2 rounded-lg hover:scale-105 transition-all shadow-md"
             >
               Đăng ký
             </Button>
@@ -181,9 +195,11 @@ export default function TopNav() {
           <Link href="/supporting-programs" className="py-2 text-center">
             Chương trình hỗ trợ
           </Link>
-          <Link href="/alltests" className="py-2 text-center">
-            Bài kiểm tra
-          </Link>
+          {user && (
+            <Link href="/alltests" className="py-2 text-center">
+              Bài kiểm tra
+            </Link>
+          )}
           <Link href="/resources" className="py-2 text-center">
             Tài nguyên
           </Link>
@@ -210,7 +226,7 @@ export default function TopNav() {
                   variant="light"
                   className="flex items-center gap-2 self-center"
                 >
-                  <FiUser size={18} /> Your Account <FiChevronDown size={16} />
+                  <FiUser size={18} /> Tài khoản <FiChevronDown size={16} />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>

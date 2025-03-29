@@ -10,7 +10,7 @@ export default function AboutPage() {
             <div className="max-w-5xl mx-auto">
                 <section className="max-w-5xl mx-auto px-4 py-12">
                   
-                    <h1 className="text-5xl text-center font-bold mb-10">About Us</h1>
+                    <h1 className="text-5xl text-center font-bold mb-10">Về Chúng Tôi</h1>
 
                 
                     <div className="flex flex-col md:flex-row items-start gap-8">
@@ -18,7 +18,7 @@ export default function AboutPage() {
                         <div className="w-full">
                             <Image
                                 src="https://media.istockphoto.com/id/1443245439/photo/business-meeting-businesswoman-woman-office-portrait-job-career-happy-businessman-teamwork.jpg?s=612x612&w=0&k=20&c=1ZR02c1UKfGdBCNWzzKlrwrVZuEiOqnAKcKF4V_t038="
-                                alt="Business team meeting"
+                                alt="Cuộc họp nhóm kinh doanh"
                                 width={600}
                                 height={400}
                                 radius="lg"
@@ -31,9 +31,9 @@ export default function AboutPage() {
                        
                         <div className="w-full">
                             <p className="mt-4 leading-10 text-xl">
-                                At <strong>MindSpace</strong>, we believe every student deserves a supportive environment for their mental well-being.
-                                Our mission is to bridge the gap in psychological health support within Vietnamese schools by providing an accessible,
-                                data-driven, and student-friendly digital platform.
+                                Tại <strong>MindSpace</strong>, chúng tôi tin rằng mỗi sinh viên đều xứng đáng có một môi trường hỗ trợ cho sức khỏe tâm lý của họ.
+                                Sứ mệnh của chúng tôi là thu hẹp khoảng cách trong hỗ trợ sức khỏe tâm lý trong các trường học Việt Nam bằng cách cung cấp một nền tảng kỹ thuật số dễ tiếp cận,
+                                dựa trên dữ liệu và thân thiện với sinh viên.
                             </p>
                         </div>
                     </div>
@@ -42,10 +42,10 @@ export default function AboutPage() {
                
                 <section className="my-20">
                     <h2 className="text-4xl font-semibold flex items-center gap-2 justify-center">
-                        <FaUsers className="text-blue-500" /> Who We Are
+                        <FaUsers className="text-blue-500" /> Chúng Tôi Là Ai
                     </h2>
                     <p className="mt-2 leading-relaxed text-center">
-                        MindSpace is a team of professionals dedicated to enhancing student mental health through technology.
+                        MindSpace là một đội ngũ chuyên gia tận tâm nâng cao sức khỏe tâm lý của sinh viên thông qua công nghệ.
                     </p>
 
                   
@@ -76,35 +76,35 @@ export default function AboutPage() {
               
                 <section className="my-20">
                     <h2 className="text-4xl font-semibold flex items-center gap-2 justify-center">
-                        <FaRocket className="text-red-500" /> Why MindSpace?
+                        <FaRocket className="text-red-500" /> Tại Sao Chọn MindSpace?
                     </h2>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 mt-4">
                         <Card className="shadow-md border border-gray-200">
-                            <CardHeader className="font-semibold text-lg">School-Focused Solution</CardHeader>
+                            <CardHeader className="font-semibold text-lg">Giải Pháp Tập Trung Vào Trường Học</CardHeader>
                             <CardBody>
-                                Designed specifically for educational environments.
+                                Được thiết kế đặc biệt cho môi trường giáo dục.
                             </CardBody>
                         </Card>
 
                         <Card className="shadow-md border border-gray-200">
-                            <CardHeader className="font-semibold text-lg">Efficient Digital Management</CardHeader>
+                            <CardHeader className="font-semibold text-lg">Quản Lý Kỹ Thuật Số Hiệu Quả</CardHeader>
                             <CardBody>
-                                Replaces outdated manual records with a streamlined system.
+                                Thay thế các hồ sơ thủ công lỗi thời bằng một hệ thống hợp lý hóa.
                             </CardBody>
                         </Card>
 
                         <Card className="shadow-md border border-gray-200">
-                            <CardHeader className="font-semibold text-lg">Direct Professional Support</CardHeader>
+                            <CardHeader className="font-semibold text-lg">Hỗ Trợ Chuyên Nghiệp Trực Tiếp</CardHeader>
                             <CardBody>
-                                Students can connect with licensed psychologists anytime they need help.
+                                Sinh viên có thể kết nối với các nhà tâm lý học có giấy phép bất cứ khi nào họ cần giúp đỡ.
                             </CardBody>
                         </Card>
 
                         <Card className="shadow-md border border-gray-200">
-                            <CardHeader className="font-semibold text-lg">Smart Analytics</CardHeader>
+                            <CardHeader className="font-semibold text-lg">Phân Tích Thông Minh</CardHeader>
                             <CardBody>
-                                Schools gain insights into student mental health trends for proactive action.
+                                Các trường học có được cái nhìn sâu sắc về xu hướng sức khỏe tâm lý của sinh viên để có hành động chủ động.
                             </CardBody>
                         </Card>
                     </div>
@@ -112,12 +112,12 @@ export default function AboutPage() {
              
             </div>
             <section className="mt-12 text-center w-full py-12 bg-blue-100">
-                    <h2 className="text-4xl font-bold">Join Us</h2>
+                    <h2 className="text-4xl font-bold">Tham Gia Cùng Chúng Tôi</h2>
                     <p className="mt-2 leading-relaxed">
-                        MindSpace is more than just a platform—it’s a movement for a healthier student community.
-                        Be a part of this initiative today.
+                        MindSpace không chỉ là một nền tảng—đó là một phong trào cho một cộng đồng sinh viên khỏe mạnh hơn.
+                        Hãy trở thành một phần của sáng kiến này ngay hôm nay.
                     </p>
-                    <Button color="primary" className="mt-4">Get Involved</Button>
+                    <Button color="primary" className="mt-4">Tham Gia Ngay</Button>
                 </section>
         </div>
     );
