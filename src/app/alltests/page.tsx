@@ -131,10 +131,10 @@ export default function AllTests() {
   } else if (userRole === "Student") {
     // If logged in as Student → Separate Psychological and Periodic tests
     psychologicalTests = tests.filter(
-      (test) => test.testCategory.name === "Tâm lý học"
+      (test) => test.testCategory.name === "Psychological"
     );
     periodicTests = tests.filter(
-      (test) => test.testCategory.name === "Định kỳ"
+      (test) => test.testCategory.name === "Periodic"
     );
   } else if (userRole === "Parent") {
     // If logged in as Parent → Show only "Parenting" tests
@@ -250,37 +250,37 @@ export default function AllTests() {
           )}
         </>
       ) : // For other users (Not logged in or Parent)
-      displayedTests.length === 0 ? (
-        <p className="text-center text-lg font-semibold text-gray-600">
-          No tests available.
-        </p>
-      ) : (
-        <div className="grid md:grid-cols-3 gap-6">
-          {displayedTests.map((test) => (
-            <Card
-              key={test.id}
-              className="bg-white shadow-md hover:shadow-lg transition duration-300"
-            >
-              <CardHeader className="text-xl font-bevnpro font-bold bg-first-color h-[80px]">
-                {test.title}
-              </CardHeader>
-              <CardBody className="px-6 font-noto-sans">
-                <p className="text-2xl font-semibold">{test.testCode}</p>
-                <p className="text-gray-600 text-lg">{test.description}</p>
-              </CardBody>
-              <CardFooter className="px-6">
-                <Button
-                  variant="shadow"
-                  className="mt-3 w-fit p-5 bg-second-color"
-                  onPress={() => handleStartTest(test.id)}
-                >
-                  Take Test
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+        displayedTests.length === 0 ? (
+          <p className="text-center text-lg font-semibold text-gray-600">
+            No tests available.
+          </p>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            {displayedTests.map((test) => (
+              <Card
+                key={test.id}
+                className="bg-white shadow-md hover:shadow-lg transition duration-300"
+              >
+                <CardHeader className="text-xl font-bevnpro font-bold bg-first-color h-[80px]">
+                  {test.title}
+                </CardHeader>
+                <CardBody className="px-6 font-noto-sans">
+                  <p className="text-2xl font-semibold">{test.testCode}</p>
+                  <p className="text-gray-600 text-lg">{test.description}</p>
+                </CardBody>
+                <CardFooter className="px-6">
+                  <Button
+                    variant="shadow"
+                    className="mt-3 w-fit p-5 bg-second-color"
+                    onPress={() => handleStartTest(test.id)}
+                  >
+                    Take Test
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
     </div>
   );
 }
