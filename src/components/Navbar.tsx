@@ -152,6 +152,9 @@ export default function TopNav() {
               <DropdownItem key="profile">
                 <Link href="/profile">Hồ sơ</Link>
               </DropdownItem>
+              <DropdownItem key="profile-invoice">
+                <Link href="/profile/invoice">Lịch sử giao dịch</Link>
+              </DropdownItem>
               {userRole !== "Parent" ? (
                 <DropdownItem key="history-program">
                   <Link href="/supporting-programs/programs-history">
